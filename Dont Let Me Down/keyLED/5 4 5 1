@@ -1,0 +1,24 @@
+on 4 5 a 42
+on 3 5 a 42
+on 4 6 a 42
+
+d 30
+
+on 4 5 a 0
+on 3 5 a 0
+on 4 6 a 0
+on 3 6 a 42
+on 2 6 a 42
+on 3 7 a 42
+
+d 30
+on 3 6 a 0
+on 2 6 a 0
+on 3 7 a 0
+
+
+
+on 2 7 a 42
+on 2 8 a 42
+on 1 7 a 42
+on 1 8 a 42

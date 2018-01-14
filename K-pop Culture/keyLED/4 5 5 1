@@ -1,0 +1,17 @@
+on 5 5 auto 59
+delay 50
+on 4 5 auto 59
+delay 50
+on 3 5 auto 59
+delay 50
+on 2 5 auto 59
+off 5 5
+delay 50
+on 1 5 auto 59
+off 4 5
+delay 50
+off 3 5
+delay 50
+off 2 5
+delay 50
+off 1 5

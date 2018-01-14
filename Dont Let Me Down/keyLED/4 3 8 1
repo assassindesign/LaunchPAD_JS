@@ -1,0 +1,18 @@
+on 3 8 a 3
+delay 50
+on 3 7 a 3
+on 2 8 a 3
+on 4 8 a 3
+delay 50
+on 3 6 a 3
+on 1 8 a 3
+on 5 8 a 3
+off 3 8
+delay 50
+off 3 7
+off 4 8
+off 2 8
+delay 50
+off 3 6
+off 5 8
+off 1 8
