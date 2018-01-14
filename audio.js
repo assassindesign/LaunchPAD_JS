@@ -22,6 +22,7 @@ var chain = 6;
 var keyX = 8, keyY = 8;
 var runF;
 var timer;
+var autoP = false;
 
 $(function() {
     canvas = document.getElementById('canv');
@@ -277,12 +278,13 @@ function getData(fName) {
 
 function auto() {
     clearInterval(runF);
+    autoP = true;
     autoProcess(0);
 }
 
 function autoProcess(tt) {
     var dur = 0;
-    if(tt < autoData.length && autoData.length > 0)
+    if(tt < autoData.length && autoData.length > 0 && autoP)
     {
         var temp = autoData[tt].split(' ');
         if(temp[0] == 'c' || temp[0] == "chain")
@@ -363,6 +365,7 @@ function test2(key, tt) {
 
 function stopT() {
     clearTimeout(st);
+    autoP = false;
 }
 
 function s2c(str) {
