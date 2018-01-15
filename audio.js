@@ -81,7 +81,7 @@ function collides(x, y) {
             {
                 //onLED(nowPage, i);
                 //setTimeout(offLED, 50, nowPage, i);
-                test2(i, 0)
+                keyLED1(i, 0)
                 playAudio(nowPage,i);
             }
             else return null;
@@ -200,7 +200,7 @@ window.addEventListener("keydown", function(e) {
     if(keyList.indexOf(e.keyCode) > -1) {
         if(!isNaN(audio[nowPage][keyList.indexOf(e.keyCode)][counter[nowPage][keyList.indexOf(e.keyCode)]].duration))
         {
-            test2(keyList.indexOf(e.keyCode), 0);
+            keyLED1(keyList.indexOf(e.keyCode), 0);
             playAudio(nowPage, keyList.indexOf(e.keyCode));
         }
         e.preventDefault();
@@ -312,11 +312,11 @@ function autoProcess(tt) {
             dur += parseInt(temp[1]);
         else if(temp[0] == 'o')
         {
-            test2((parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1), 0)
+            keyLED1((parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1), 0)
             playAudio(nowPage, (parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1));
         }
         else if(temp[0] == 'f')
-            test3(((parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1), 0))
+            keyLED2(((parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1), 0))
 
         dur--;
         if(dur < 0)
@@ -358,7 +358,8 @@ function offLED(page, key)
 
 var st;
 
-function test2(key, tt) {
+//LED 활성화를 위한 함수
+function keyLED1(key, tt) {
     var dur=0;
     var temp = keyTest[nowPage][key][tt];
     if(tt < keyTest[nowPage][key].length && temp.length > 0)
@@ -384,13 +385,14 @@ function test2(key, tt) {
             dur = 0;
 
         if(dur >= 1)
-            st = setTimeout(test2,dur,key,tt+1);
+            st = setTimeout(keyLED1,dur,key,tt+1);
         else
-            test2(key, tt+1);
+            keyLED1(key, tt+1);
     }
 }
 
-function test3(key, tt) {
+//LED 비활성화를 위한 함수
+function keyLED2(key, tt) {
     var temp = keyTest[nowPage][key][tt];
     if(tt < keyTest[nowPage][key].length && temp.length > 0)
     {
@@ -399,7 +401,7 @@ function test3(key, tt) {
             if(str[0] == 'o' || str[0] == 'f')
                 offLED(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1));
 
-        test3(key, tt+1);
+        keyLED2(key, tt+1);
     }
 }
 
