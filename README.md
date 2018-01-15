@@ -10,4 +10,4 @@ Button List
 
 Video
 
-(https://youtu.be/Q-2MmORCvQo)
+[![LPSJ](https://github.com/rouismia/LaunchPAD_JS/blob/master/GIF4.gif?raw=true)](https://youtu.be/Q-2MmORCvQo "LPSJ")
