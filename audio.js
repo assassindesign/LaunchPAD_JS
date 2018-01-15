@@ -2,9 +2,10 @@
 var keyList = [65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,
     49,50,51,52,53,54,55,56,57,48,32,
     96,97,98,99,100,101,102,103,104,105,
-    106,107,108,109,110,111,
-    186,187,188,189,190,191,192,219,220,221,222];
+    111,106,109,107,110,
+    189,187,8,219,221,220,186,222,188,190,191,192,16];
 var velocity = getData("velocity").split('\n');
+var select, songs;
 var keyColor = [];
 var pressedKey = [];
 var oriPressedKey = null;
@@ -31,6 +32,15 @@ var autoP = false;
 $(function() {
     canvas = document.getElementById('canv');
     ctx = canvas.getContext('2d');
+
+    select = document.getElementById("Selector");
+    songs = getData('Songs').split('\n');
+    for(var s = 0; s < songs.length; s++){
+        var option = document.createElement('option');
+        option.value = s;
+        option.text = songs[s];
+        select.add(option);
+    }
 
     for(var j = 0 ; j < chain; j++)
     {
@@ -104,7 +114,7 @@ function collides2(x, y) {
             && top <= y) {
             isCollision = cirs[i];
             nowPage = i;
-            render();
+            stopT();
         }
     }
     return isCollision;
@@ -224,7 +234,8 @@ function playAudio(page, key) {
 var keyTest = [];
 
 function setProject() {
-    projectName = document.getElementById("pName").value;
+    projectName = songs[select.selectedIndex];
+    console.log(projectName);
 
     for(var j = 0 ; j < chain; j++)
     {
@@ -299,6 +310,7 @@ function getData(fName) {
 }
 
 function auto() {
+    stopT();
     autoP = true;
     autoProcess(0);
 }
@@ -413,6 +425,13 @@ function keyLED2(key, tt) {
 function stopT() {
     clearTimeout(st);
     autoP = false;
+    for(var i=0; i<chain; i++)
+        for(var j=0; j<keyX*keyY; j++)
+        {
+            pressedKey[i][j] = 0;
+            coloredKey[i][j] = strokeColor;
+        }
+    render();
 }
 
 function s2c(str) {
