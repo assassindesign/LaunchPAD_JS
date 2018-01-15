@@ -20,7 +20,6 @@ var nowPage = 0;
 var projectName;
 var chain = 6;
 var keyX = 8, keyY = 8;
-var runF;
 var timer;
 var autoP = false;
 
@@ -76,9 +75,9 @@ function collides(x, y) {
             isCollision = rects[i];
             if(!isNaN(audio[nowPage][i][counter[nowPage][i]].duration))
             {
-                onLED(nowPage, i);
-                setTimeout(offLED, 50, nowPage, i);
-                //test2(i, 0)
+                //onLED(nowPage, i);
+                //setTimeout(offLED, 50, nowPage, i);
+                test2(i, 0)
                 playAudio(nowPage,i);
             }
             else return null;
@@ -98,6 +97,7 @@ function collides2(x, y) {
             && top <= y) {
             isCollision = cirs[i];
             nowPage = i;
+            render();
         }
     }
     return isCollision;
@@ -114,7 +114,7 @@ window.addEventListener('keyup', function(e) {
 function render() {
     if(canvas && canvas.getContext) {
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        siz = canvas.width > canvas.height ? canvas.height : canvas.width;
+        var siz = canvas.width > canvas.height ? canvas.height : canvas.width;
         var cornerRad = siz/(keyX*keyY);
         var cornerRadius = siz/(keyX*keyY);
 
@@ -130,17 +130,19 @@ function render() {
         }
         
         if(ctx) {
+            ctx.fillStyle=baseColor;
+            //ctx.lineJoin = "round";
+            ctx.lineWidth = cornerRadius/2;
+            // ctx.shadowBlur = 0;
+            // ctx.shadowColor = "#FFFFFF";
             for(var i = 0 ; i < rects.length; i++) {
-                ctx.fillStyle=baseColor;
                 if(pressedKey[nowPage][i] > 0)
                     ctx.strokeStyle=coloredKey[nowPage][i];
                 else ctx.strokeStyle=baseColor;
-                ctx.lineJoin = "round";
-                ctx.lineWidth = cornerRadius/2;
-                ctx.shadowBlur = 5;
-                ctx.shadowColor = "#FFFFFF";
+                
                 ctx.strokeRect(rects[i].x+cornerRadius/2, rects[i].y+cornerRadius/2, rects[i].w-cornerRadius, rects[i].h-cornerRadius);
-                ctx.fillRect(rects[i].x+cornerRadius/2, rects[i].y+cornerRadius/2, rects[i].w-cornerRadius, rects[i].h-cornerRadius);
+                //ctx.fillRect(rects[i].x+cornerRadius/2, rects[i].y+cornerRadius/2, rects[i].w-cornerRadius, rects[i].h-cornerRadius);
+                ctx.fillRect(rects[i].x, rects[i].y, rects[i].w, rects[i].h);
             }
             for(var i = 0 ; i < chain ; i++) {
                 cirs[i] = {x: rects[(i+1)*keyX-1].x+rects[0].w+cornerRadius/2, y: rects[(i+1)*keyX-1].y, w: rects[(i+1)*keyX-1].w, h: rects[(i+1)*keyX-1].h};
@@ -161,6 +163,29 @@ function render() {
     }
 }
 
+function animate(key){
+    var siz = canvas.width > canvas.height ? canvas.height : canvas.width;
+    var cornerRad = siz/(keyX*keyY);
+    var cornerRadius = siz/(keyX*keyY);
+
+    if(ctx) {
+        ctx.fillStyle=baseColor;
+        ctx.lineJoin = "round";
+        ctx.lineWidth = cornerRadius/2;
+        //ctx.shadowBlur = 5;
+        //ctx.shadowColor = "#FFFFFF";
+        if(key < rects.length) {
+            ctx.clearRect(rects[key].x, rects[key].y, rects[key].w, rects[key].h);
+            if(pressedKey[nowPage][key] > 0)
+                ctx.strokeStyle=coloredKey[nowPage][key];
+            else ctx.strokeStyle=baseColor;
+            
+            ctx.strokeRect(rects[key].x+cornerRadius/2, rects[key].y+cornerRadius/2, rects[key].w-cornerRadius, rects[key].h-cornerRadius);
+            ctx.fillRect(rects[key].x+cornerRadius/2, rects[key].y+cornerRadius/2, rects[key].w-cornerRadius, rects[key].h-cornerRadius);
+        }
+    }
+}
+
 function Clicked(e) {
     console.log('click: ' + e.offsetX + '/' + e.offsetY);
     var rect = collides(e.offsetX, e.offsetY);
@@ -174,18 +199,12 @@ function Clicked(e) {
     }
 }
 
-function run() {
-    render();
-}
-
 window.addEventListener("keydown", function(e) {
     // 입력키 제외하고는 무시
     if(keyList.indexOf(e.keyCode) > -1) {
         if(!isNaN(audio[nowPage][keyList.indexOf(e.keyCode)][counter[nowPage][keyList.indexOf(e.keyCode)]].duration))
         {
-            onLED(nowPage, keyList.indexOf(e.keyCode));
-            setTimeout(offLED, 50, nowPage, keyList.indexOf(e.keyCode));
-            //test2(keyList.indexOf(e.keyCode), 0);
+            test2(keyList.indexOf(e.keyCode), 0);
             playAudio(nowPage, keyList.indexOf(e.keyCode));
         }
         e.preventDefault();
@@ -252,16 +271,16 @@ function setProject() {
             keyY = parseInt(str[1]);
     }
 
-    // for(var j = 0 ; j < chain; j++)
-    // {
-    //     keyTest[j] = [];
-    //     for(var i = 0 ; i < keyX*keyY; i++)
-    //         keyTest[j][i] = getData(projectName+'/keyLED/'+(j+1)+' '+(parseInt(i/keyY)+1)+' '+(i%keyY+1)+' 1').split('\n');
-    // }
+    for(var j = 0 ; j < chain; j++)
+    {
+        keyTest[j] = [];
+        for(var i = 0 ; i < keyX*keyY; i++)
+            keyTest[j][i] = getData(projectName+'/keyLED/'+(j+1)+' '+(parseInt(i/keyY)+1)+' '+(i%keyY+1)+' 1').split('\n');
+    }
 
     autoData = getData(projectName+'/autoPlay').split("\n");
 
-    runF = setInterval(run, 1);
+    render();
 }
 
 function getData(fName) {
@@ -277,7 +296,6 @@ function getData(fName) {
 }
 
 function auto() {
-    clearInterval(runF);
     autoP = true;
     autoProcess(0);
 }
@@ -288,17 +306,19 @@ function autoProcess(tt) {
     {
         var temp = autoData[tt].split(' ');
         if(temp[0] == 'c' || temp[0] == "chain")
-            nowPage = parseInt(temp[1])-1;
-        if(temp[0] == 'd' || temp[0] == 'delay')
-            dur += parseInt(temp[1]);
-        if(temp[0] == 'o')
         {
-            //test2((parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1), 0)
-            onLED(nowPage, (parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1))
+            nowPage = parseInt(temp[1])-1;
+            render();
+        }
+        else if(temp[0] == 'd' || temp[0] == 'delay')
+            dur += parseInt(temp[1]);
+        else if(temp[0] == 'o')
+        {
+            test2((parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1), 0)
             playAudio(nowPage, (parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1));
         }
-        if(temp[0] == 'f')
-            offLED(nowPage, (parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1))
+        else if(temp[0] == 'f')
+            test3(((parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1), 0))
 
         dur--;
         if(dur < 0)
@@ -308,27 +328,31 @@ function autoProcess(tt) {
         else
             autoProcess(++tt);
     }
-    else
-        runF = setInterval(run, 1);
 }
 
 function onLED(page, key)
 {
     pressedKey[page][key] = 1;
-    render();
+    requestAnimationFrame(function(){
+        animate(key);
+    });
 }
 
 function onLED2(page, key, color)
 {
     pressedKey[page][key] = 1;
     coloredKey[page][key] = s2c(color);
-    render();
+    requestAnimationFrame(function(){
+        animate(key);
+    });
 }
 
 function offLED(page, key)
 {
     pressedKey[page][key] = 0;
-    render();
+    requestAnimationFrame(function(){
+        animate(key);
+    });
 }
 
 var st;
@@ -336,19 +360,16 @@ var st;
 function test2(key, tt) {
     var dur=0;
     var temp = keyTest[nowPage][key][tt];
-    console.log(temp);
-    console.log(keyTest[nowPage][key].length);
     if(tt < keyTest[nowPage][key].length && temp.length > 0)
     {
         var str = temp.split(' ');
-        console.log(str.length);
         if(str.length > 0)
         {
             if(str[0] == 'd' || str[0] == 'delay')
                 dur += parseInt(str[1]);
-            if(str[0] == 'o')
-                onLED(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1));
-            if(str[0] == 'f')
+            else if(str[0] == 'o' || str[0] == 'on')
+                onLED2(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1), str[4]);
+            else if(str[0] == 'f' || str[0] == 'off')
                 offLED(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1));
         }
 
@@ -360,6 +381,19 @@ function test2(key, tt) {
             st = setTimeout(test2,dur,key,tt+1);
         else
             test2(key, tt+1);
+    }
+}
+
+function test3(key, tt) {
+    var temp = keyTest[nowPage][key][tt];
+    if(tt < keyTest[nowPage][key].length && temp.length > 0)
+    {
+        var str = temp.split(' ');
+        if(str.length > 0)
+            if(str[0] == 'o' || str[0] == 'f')
+                offLED(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1));
+
+        test3(key, tt+1);
     }
 }
 
