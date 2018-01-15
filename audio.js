@@ -12,7 +12,7 @@ var coloredKey = [];
 var keyCount = [];
 var counter = [];
 var baseColor = "#FFFFFF";
-var strokeColor = "rgba(255,255,255,0.5)";
+var strokeColor = "rgba(255,255,255,0.75)";
 var sound = [];
 var audio = [];
 var autoData = [];
@@ -27,6 +27,7 @@ var keyX = 8, keyY = 8;
 var timer;
 var autoP = false;
 
+// initialization
 $(function() {
     canvas = document.getElementById('canv');
     ctx = canvas.getContext('2d');
@@ -67,6 +68,7 @@ window.onload = function() {
     }, false);
 }
 
+// 마우스 클릭(음원 버튼)
 function collides(x, y) {
     var isCollision = false;
     for (var i = 0, len = rects.length; i < len; i++) {
@@ -90,6 +92,7 @@ function collides(x, y) {
     return isCollision;
 }
 
+// 마우스 클릭(페이지 버튼)
 function collides2(x, y) {
     var isCollision = false;
     for (var i = 0, len = cirs.length; i < len; i++) {
@@ -107,6 +110,7 @@ function collides2(x, y) {
     return isCollision;
 }
 
+// 키 입력 이벤트
 var keysDown = {};
 window.addEventListener('keydown', function(e) {
     keysDown[e.keyCode] = true;
@@ -115,6 +119,7 @@ window.addEventListener('keyup', function(e) {
     delete keysDown[e.keyCode];
 });
 
+// 화면 기초 랜더링
 function render() {
     if(canvas && canvas.getContext) {
         ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -147,7 +152,7 @@ function render() {
                 ctx.beginPath();
                 ctx.arc(rects[(i+1)*keyX-1].x+cornerRad*(keyY+2), rects[(i+1)*keyX-1].y+cornerRad*(Math.PI), rects[(i+1)*keyX-1].w/2.5, 0, 2*Math.PI, false);
                 if(nowPage == i)
-                    ctx.fillStyle = 'grey';
+                    ctx.fillStyle = 'rgba(0,255,255,0.75)';
                 else
                     ctx.fillStyle = 'white';
                 ctx.lineWidth = cornerRad/keyY;
