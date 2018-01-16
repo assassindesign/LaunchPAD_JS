@@ -8,12 +8,13 @@ var velocity = getData("velocity").split('\n');
 var select, songs;
 var keyColor = [];
 var pressedKey = [];
-var oriPressedKey = null;
 var coloredKey = [];
+var oriPressedKey = [];
+var oriColoredKey = [];
 var keyCount = [];
 var counter = [];
 var baseColor = "#FFFFFF";
-var strokeColor = "rgba(255,255,255,0.75)";
+var strokeColor = "rgba(255,255,255,0.7)";
 var sound = [];
 var audio = [];
 var autoData = [];
@@ -114,7 +115,7 @@ function collides2(x, y) {
             && top <= y) {
             isCollision = cirs[i];
             nowPage = i;
-            stopT();
+            initz();
         }
     }
     return isCollision;
@@ -237,6 +238,24 @@ function setProject() {
     projectName = songs[select.selectedIndex];
     console.log(projectName);
 
+    info = getData(projectName+'/info').split("\n");
+    for(var i = 0 ; i < info.length ; i++)
+    {
+        var str = info[i].split('=');
+        if(str[0] == "chain")
+            chain = parseInt(str[1]);
+        if(str[0] == "buttonX")
+            keyX = parseInt(str[1]);
+        if(str[0] == "buttonY")
+            keyY = parseInt(str[1]);
+    }
+
+    sound.length = 0;
+    audio.length = 0;
+    pressedKey.length = 0;
+    coloredKey.length = 0;
+    keyCount.length = 0;
+    counter.length = 0;
     for(var j = 0 ; j < chain; j++)
     {
         sound[j] = [];
@@ -271,18 +290,6 @@ function setProject() {
         else continue;
     }
 
-    info = getData(projectName+'/info').split("\n");
-    for(var i = 0 ; i < info.length ; i++)
-    {
-        var str = info[i].split('=');
-        if(str[0] == "chain")
-            chain = parseInt(str[1]);
-        if(str[0] == "buttonX")
-            keyX = parseInt(str[1]);
-        if(str[0] == "buttonY")
-            keyY = parseInt(str[1]);
-    }
-
     for(var j = 0 ; j < chain; j++)
     {
         keyTest[j] = [];
@@ -292,7 +299,18 @@ function setProject() {
 
     autoData = getData(projectName+'/autoPlay').split("\n");
     for(var pp = 0 ; pp < velocity.length; pp++)
-        keyColor[pp] = "rgba("+velocity[pp]+",0.5)";
+        keyColor[pp] = "rgba("+velocity[pp]+",1)";
+
+    for(var i=0; i<chain; i++)
+    {
+        oriPressedKey[i] = [];
+        oriColoredKey[i] = [];
+        for(var j=0; j<keyX*keyY; j++)
+        {
+            oriPressedKey[i][j] = 0;
+            oriColoredKey[i][j] = strokeColor;
+        }
+    }
 
     render();
 }
@@ -315,6 +333,12 @@ function auto() {
     autoProcess(0);
 }
 
+function initz() {
+    pressedKey[nowPage].fill(0);
+    coloredKey[nowPage].fill(strokeColor);
+    render();
+}
+
 function autoProcess(tt) {
     var dur = 0;
     if(tt < autoData.length && autoData.length > 0 && autoP)
@@ -323,7 +347,7 @@ function autoProcess(tt) {
         if(temp[0] == 'c' || temp[0] == "chain")
         {
             nowPage = parseInt(temp[1])-1;
-            render();
+            initz();
         }
         else if(temp[0] == 'd' || temp[0] == 'delay')
             dur += parseInt(temp[1]);
@@ -425,13 +449,7 @@ function keyLED2(key, tt) {
 function stopT() {
     clearTimeout(st);
     autoP = false;
-    for(var i=0; i<chain; i++)
-        for(var j=0; j<keyX*keyY; j++)
-        {
-            pressedKey[i][j] = 0;
-            coloredKey[i][j] = strokeColor;
-        }
-    render();
+    initz();
 }
 
 function s2c(str) {
