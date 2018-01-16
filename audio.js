@@ -5,6 +5,7 @@ var keyList = [65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86
     111,106,109,107,110,
     189,187,8,219,221,220,186,222,188,190,191,192,16];
 var velocity = getData("velocity").split('\n');
+var opacity = ",1)";
 var select, songs;
 var keyColor = [];
 var pressedKey = [];
@@ -208,9 +209,11 @@ function animate(key){
             ctx.lineJoin="round";
             ctx.lineWidth = cornerRad/(keyY*0.25);
             ctx.strokeStyle=coloredKey[nowPage][key];
-            ctx.shadowBlur=(keyY+keyX)/2;
-            ctx.shadowColor="rgba(0,0,0,0.33)";
+            //ctx.fillStyle=coloredKey[nowPage][key];
+            ctx.shadowBlur=(keyY+keyX);
+            ctx.shadowColor="rgba(0,0,0,0.66)";
             ctx.strokeRect(rects[key].x+cornerRad, rects[key].y+cornerRad, rects[key].w-cornerRad*2, rects[key].h-cornerRad*2)
+            //ctx.fillRect(rects[key].x+cornerRad, rects[key].y+cornerRad, rects[key].w-cornerRad*2, rects[key].h-cornerRad*2)
         }
     }
 }
@@ -253,7 +256,7 @@ var keyTest = [];
 
 function setProject() {
     projectName = songs[select.selectedIndex];
-    console.log(projectName);
+    nowPage = 0;
 
     var info = getData(projectName+'/info').split("\n");
     for(var i = 0 ; i < info.length ; i++)
@@ -319,7 +322,7 @@ function setProject() {
     keyColor.length=0;
     autoData = getData(projectName+'/autoPlay').split("\n");
     for(var pp = 0 ; pp < velocity.length; pp++)
-        keyColor[pp] = "rgba("+velocity[pp]+",1)";
+        keyColor[pp] = "rgba("+velocity[pp]+opacity;
 
     oriPressedKey.length=0;
     oriColoredKey.length=0;
