@@ -152,13 +152,16 @@ function render() {
         
         if(ctx) {
             for(var i = 0 ; i < rects.length; i++) {
-                if(pressedKey[nowPage][i] > 0)
-                    ctx.strokeStyle=coloredKey[nowPage][i];
-                else ctx.strokeStyle=strokeColor;
+                // if(pressedKey[nowPage][i] > 0)
+                //     ctx.strokeStyle=coloredKey[nowPage][i];
+                // else ctx.strokeStyle=strokeColor;
+                ctx.strokeStyle=strokeColor;
                 ctx.fillStyle=baseColor;
                 ctx.strokeRect(rects[i].x+cornerRad/2, rects[i].y+cornerRad/2, rects[i].w-cornerRad, rects[i].h-cornerRad);
                 ctx.fillRect(rects[i].x+cornerRad/2, rects[i].y+cornerRad/2, rects[i].w-cornerRad, rects[i].h-cornerRad);
                 //ctx.fillRect(rects[i].x, rects[i].y, rects[i].w, rects[i].h);
+                ctx.shadowBlur=0;
+                ctx.shadowColor="transparent";
             }
             for(var i = 0 ; i < chain ; i++) {
                 cirs[i] = {x: rects[(i+1)*keyX-1].x+rects[0].w+cornerRad/2, y: rects[(i+1)*keyX-1].y, w: rects[(i+1)*keyX-1].w, h: rects[(i+1)*keyX-1].h};
