@@ -210,7 +210,7 @@ function animate(key){
             ctx.lineWidth = cornerRad/(keyY*0.25);
             ctx.strokeStyle=coloredKey[nowPage][key];
             //ctx.fillStyle=coloredKey[nowPage][key];
-            ctx.shadowBlur=(keyY+keyX);
+            ctx.shadowBlur=cornerRad;
             ctx.shadowColor="rgba(0,0,0,0.66)";
             ctx.strokeRect(rects[key].x+cornerRad, rects[key].y+cornerRad, rects[key].w-cornerRad*2, rects[key].h-cornerRad*2)
             //ctx.fillRect(rects[key].x+cornerRad, rects[key].y+cornerRad, rects[key].w-cornerRad*2, rects[key].h-cornerRad*2)

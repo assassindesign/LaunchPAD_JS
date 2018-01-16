@@ -9,8 +9,11 @@ Button List
 	a-z, number 1-9 0, spacebar, numpad 0-9 / * - + del, - = backspace [ ] \ ; ' , . / `
 
 Video
-	Clickâ–¼
+	Click?–¼
 [![LPSJ](https://github.com/rouismia/LaunchPAD_JS/blob/master/GIF4.gif?raw=true)](https://youtu.be/Q-2MmORCvQo "LPSJ")
 
-	Version2â–¼
+	Version2?–¼
 [![LPSJ_2](https://github.com/rouismia/LaunchPAD_JS/blob/master/GIF.gif?raw=true)](https://www.youtube.com/watch?v=qfbsu-vFfRY "LPSJ_2")
+
+	Version3?–¼
+[![LPSJ_3](https://github.com/rouismia/LaunchPAD_JS/blob/master/GIF2.gif?raw=true)](https://www.youtube.com/watch?v=qfbsu-vFfRY "LPSJ_3")
