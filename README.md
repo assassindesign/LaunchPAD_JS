@@ -11,3 +11,6 @@ Button List
 Video
 	Click▼
 [![LPSJ](https://github.com/rouismia/LaunchPAD_JS/blob/master/GIF4.gif?raw=true)](https://youtu.be/Q-2MmORCvQo "LPSJ")
+
+	Version2▼
+[![LPSJ_2](https://github.com/rouismia/LaunchPAD_JS/blob/master/GIF.gif?raw=true)](https://www.youtube.com/watch?v=qfbsu-vFfRY "LPSJ_2")
