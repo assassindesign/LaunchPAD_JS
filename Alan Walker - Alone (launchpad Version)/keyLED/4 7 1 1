@@ -1,0 +1,31 @@
+
+on 8 1 a 96
+d 30
+on 8 2 a 96 
+on 7 1 a 96 
+d 30
+on 8 3 a 96 
+on 7 2 a 96 
+on 6 1 a 96 
+off 8 1
+d 30
+on 8 4 a 96 
+on 7 3 a 96 
+on 6 2 a 96 
+on 5 1 a 96 
+off 8 2
+off 7 1
+d 30
+on 8 5 a 96 
+on 7 4 a 96 
+on 6 3 a 96 
+on 5 2 a 96 
+on 4 1 a 96 
+off 8 3
+off 7 2
+off 6 1
+d 30
+off 8 4
+off 7 3
+off 6 2
+off 5 1

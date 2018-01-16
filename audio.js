@@ -14,7 +14,7 @@ var oriColoredKey = [];
 var keyCount = [];
 var counter = [];
 var baseColor = "#FFFFFF";
-var strokeColor = "rgba(255,255,255,0.7)";
+var strokeColor = "rgba(255,255,255,0.6)";
 var sound = [];
 var audio = [];
 var autoData = [];
@@ -133,6 +133,8 @@ window.addEventListener('keyup', function(e) {
 // 화면 기초 랜더링
 function render() {
     if(canvas && canvas.getContext) {
+        ctx.shadowBlur=0;
+        ctx.shadowColor="transparent";
         ctx.clearRect(0,0,canvas.width,canvas.height);
         var siz = canvas.width > canvas.height ? canvas.height : canvas.width;
         var cornerRad = siz/(keyX*keyY);
@@ -140,7 +142,7 @@ function render() {
         ctx.fillStyle="#444444";
         ctx.strokeStyle="#444444";
         ctx.lineJoin = "round";
-        ctx.lineWidth = cornerRad;
+        ctx.lineWidth = cornerRad/(keyY*0.15);
         ctx.strokeRect(cornerRad/2, cornerRad/2, canvas.width-cornerRad, canvas.height-cornerRad);
         ctx.fillRect(cornerRad/2, cornerRad/2, canvas.width-cornerRad, canvas.height-cornerRad);
 
@@ -166,8 +168,8 @@ function render() {
                     ctx.fillStyle = 'rgba(0,255,255,0.75)';
                 else
                     ctx.fillStyle = 'white';
-                ctx.lineWidth = cornerRad/keyY;
                 ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth=cornerRad/(keyY*0.5);
                 ctx.fill();
                 ctx.stroke();
             }
@@ -180,21 +182,33 @@ function render() {
 function animate(key){
     var siz = canvas.width > canvas.height ? canvas.height : canvas.width;
     var cornerRad = siz/(keyX*keyY);
+    ctx.shadowBlur=0;
+    ctx.shadowColor="transparent";
 
     if(key < rects.length) {
         //ctx.clearRect(rects[key].x, rects[key].y, rects[key].w, rects[key].h);
         ctx.clearRect(rects[key].x+cornerRad/2, rects[key].y+cornerRad/2, rects[key].w-cornerRad, rects[key].h-cornerRad);
         ctx.fillStyle="#444444";
         ctx.lineJoin = "round";
-        ctx.lineWidth = cornerRad;
+        ctx.lineWidth = cornerRad/(keyY*0.15);
         ctx.fillRect(rects[key].x, rects[key].y, rects[key].w, rects[key].h);
 
-        if(pressedKey[nowPage][key] > 0)
-            ctx.strokeStyle=coloredKey[nowPage][key];
-        else ctx.strokeStyle=strokeColor
+        // if(pressedKey[nowPage][key] > 0)
+        //     ctx.strokeStyle=coloredKey[nowPage][key];
+        // else ctx.strokeStyle=strokeColor
+        ctx.strokeStyle=strokeColor;
         ctx.fillStyle=baseColor;
         ctx.strokeRect(rects[key].x+cornerRad/2, rects[key].y+cornerRad/2, rects[key].w-cornerRad, rects[key].h-cornerRad);
         ctx.fillRect(rects[key].x+cornerRad/2, rects[key].y+cornerRad/2, rects[key].w-cornerRad, rects[key].h-cornerRad);
+        if(pressedKey[nowPage][key]>0)
+        {
+            ctx.lineJoin="round";
+            ctx.lineWidth = cornerRad/(keyY*0.25);
+            ctx.strokeStyle=coloredKey[nowPage][key];
+            ctx.shadowBlur=(keyY+keyX)/2;
+            ctx.shadowColor="rgba(0,0,0,0.33)";
+            ctx.strokeRect(rects[key].x+cornerRad, rects[key].y+cornerRad, rects[key].w-cornerRad*2, rects[key].h-cornerRad*2)
+        }
     }
 }
 
@@ -238,7 +252,7 @@ function setProject() {
     projectName = songs[select.selectedIndex];
     console.log(projectName);
 
-    info = getData(projectName+'/info').split("\n");
+    var info = getData(projectName+'/info').split("\n");
     for(var i = 0 ; i < info.length ; i++)
     {
         var str = info[i].split('=');
@@ -290,6 +304,7 @@ function setProject() {
         else continue;
     }
 
+    keyTest.length=0;
     for(var j = 0 ; j < chain; j++)
     {
         keyTest[j] = [];
@@ -297,10 +312,14 @@ function setProject() {
             keyTest[j][i] = getData(projectName+'/keyLED/'+(j+1)+' '+(parseInt(i/keyY)+1)+' '+(i%keyY+1)+' 1').split('\n');
     }
 
+    autoData.length=0;
+    keyColor.length=0;
     autoData = getData(projectName+'/autoPlay').split("\n");
     for(var pp = 0 ; pp < velocity.length; pp++)
         keyColor[pp] = "rgba("+velocity[pp]+",1)";
 
+    oriPressedKey.length=0;
+    oriColoredKey.length=0;
     for(var i=0; i<chain; i++)
     {
         oriPressedKey[i] = [];

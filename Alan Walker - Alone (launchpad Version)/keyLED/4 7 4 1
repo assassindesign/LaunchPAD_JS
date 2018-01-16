@@ -1,0 +1,145 @@
+on 4 5 a 124
+on 5 5 a 124
+on 5 4 a 124
+on 4 4 a 124
+off 2 2
+off 7 2
+off 7 7
+off 2 7
+d 30
+off 3 3
+off 6 3
+off 6 6
+off 3 6
+d 30
+on 3 5 a 124
+on 4 6 a 124
+on 5 6 a 124
+on 6 5 a 124
+on 6 4 a 124
+on 5 3 a 124
+on 4 3 a 124
+on 3 4 a 124
+d 30
+on 2 5 a 124
+on 3 6 a 124
+on 4 7 a 124
+on 5 7 a 124
+on 6 6 a 124
+on 7 5 a 124
+on 7 4 a 124
+on 6 3 a 124
+on 5 2 a 124
+on 4 2 a 124
+on 3 3 a 124
+on 2 4 a 124
+off 4 4
+off 4 5
+off 5 5
+off 5 4
+d 30
+on 1 5 a 124
+on 2 6 a 124
+on 3 7 a 124
+on 4 8 a 124
+on 5 8 a 124
+on 6 7 a 124
+on 7 6 a 124
+on 8 5 a 124
+on 8 4 a 124
+on 7 3 a 124
+on 6 2 a 124
+on 5 1 a 124
+on 4 1 a 124
+on 3 2 a 124
+on 2 3 a 124
+on 1 4 a 124
+off 3 4
+off 3 5
+off 4 6
+off 5 6
+off 6 5
+off 6 4
+off 5 3
+off 4 3
+d 30
+on 1 6 a 124
+on 2 7 a 124
+on 3 8 a 124
+on 6 8 a 124
+on 7 7 a 124
+on 8 6 a 124
+on 8 3 a 124
+on 7 2 a 124
+on 6 1 a 124
+on 3 1 a 124
+on 2 2 a 124
+on 1 3 a 124
+off 7 5
+off 6 6
+off 5 7
+off 4 7
+off 3 6
+off 2 5
+off 2 4
+off 3 3
+off 4 2
+off 5 2
+off 6 3
+off 7 4
+d 30
+on 2 1 a 124
+on 1 2 a 124
+on 1 7 a 124
+on 2 8 a 124
+on 7 8 a 124
+on 8 7 a 124
+on 8 2 a 124
+on 7 1 a 124
+off 4 1
+off 3 2
+off 2 3
+off 1 4
+off 1 5
+off 2 6
+off 3 7
+off 4 8
+off 5 8
+off 6 7
+off 7 6
+off 8 5
+off 8 4
+off 7 3
+off 6 2
+off 5 1
+d 30
+on 1 8 a 124
+on 8 8 a 124
+on 8 1 a 124
+on 1 1 a 124
+off 1 6
+off 2 7
+off 3 8
+off 6 8
+off 7 7
+off 8 6
+off 8 3
+off 7 2
+off 6 1
+off 3 1
+off 2 2
+off 1 3
+d 30
+off 1 7
+off 2 8
+off 7 8
+off 8 7
+off 8 2
+off 7 1
+off 2 1
+off 1 2
+d 30
+off 8 8
+off 1 8
+off 1 1
+off 8 1
