@@ -4,9 +4,10 @@ var keyList = [65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86
     96,97,98,99,100,101,102,103,104,105,
     111,106,109,107,110,
     189,187,8,219,221,220,186,222,188,190,191,192,16];
-var velocity = getData("velocity").split('\n');
+var url = 'http://127.0.0.1:9000';
+var velocity;
 var opacity = ",1)";
-var select, songs;
+var select, songs, LEDList;
 var keyColor = [];
 var pressedKey = [];
 var coloredKey = [];
@@ -36,13 +37,19 @@ $(function() {
     ctx = canvas.getContext('2d');
 
     select = document.getElementById("Selector");
-    songs = getData('Songs').split('\n');
-    for(var s = 0; s < songs.length; s++){
-        var option = document.createElement('option');
-        option.value = s;
-        option.text = songs[s];
-        select.add(option);
-    }
+    getData("./Songs", function(result){
+        songs = result.msg;
+        for(var s = 0; s < songs.length; s++){
+            var option = document.createElement('option');
+            option.value = s;
+            option.text = songs[s].split('\n')[0];
+            select.add(option);
+        }
+    });
+
+    getData("./Velocity", function(result){
+        velocity = result.msg;
+    });
 
     for(var j = 0 ; j < chain; j++)
     {
@@ -219,15 +226,15 @@ function animate(key){
 }
 
 function Clicked(e) {
-    console.log('click: ' + e.offsetX + '/' + e.offsetY);
+    //console.log('click: ' + e.offsetX + '/' + e.offsetY);
     var rect = collides(e.offsetX, e.offsetY);
     var cir = collides2(e.offsetX, e.offsetY);
     if(rect) {
-        console.log('collision1: '+rect.x+'/'+rect.y);
+        //console.log('collision1: '+rect.x+'/'+rect.y);
     } else if(cir) {
-        console.log('collision2: '+rect.x+'/'+rect.y);
+        //console.log('collision2: '+rect.x+'/'+rect.y);
     } else {
-        console.log('no collision');
+        //console.log('no collision');
     }
 }
 
@@ -258,71 +265,94 @@ function setProject() {
     projectName = songs[select.selectedIndex];
     nowPage = 0;
 
-    var info = getData(projectName+'/info').split("\n");
-    for(var i = 0 ; i < info.length ; i++)
-    {
-        var str = info[i].split('=');
-        if(str[0] == "chain")
-            chain = parseInt(str[1]);
-        if(str[0] == "buttonX")
-            keyX = parseInt(str[1]);
-        if(str[0] == "buttonY")
-            keyY = parseInt(str[1]);
-    }
-
-    sound.length = 0;
-    audio.length = 0;
-    pressedKey.length = 0;
-    coloredKey.length = 0;
-    keyCount.length = 0;
-    counter.length = 0;
-    for(var j = 0 ; j < chain; j++)
-    {
-        sound[j] = [];
-        audio[j] = [];
-        pressedKey[j] = [];
-        coloredKey[j] = [];
-        keyCount[j] = [];
-        counter[j] = [];
-        for(var i = 0 ; i < keyX*keyY; i++)
+    getData(projectName+'/info', function(result){
+        info = result.msg;
+        for(var i = 0 ; i < info.length ; i++)
         {
-            sound[j][i] = [];
-            audio[j][i] = [];
-            pressedKey[j][i] = 0
-            coloredKey[j][i] = "#FF0000";
-            keyCount[j][i] = 0;
-            counter[j][i] = 0;
+            var str = info[i].split('=');
+            if(str[0] == "chain")
+                chain = parseInt(str[1]);
+            if(str[0] == "buttonX")
+                keyX = parseInt(str[1]);
+            if(str[0] == "buttonY")
+                keyY = parseInt(str[1]);
         }
-    }
 
-    var keyS = getData(projectName+'/keySound').split("\n");
-    for(var i=0; i < keyS.length; i++)
-    {
-        var str = keyS[i].split(' ');
-        if(str.length == 4)
+        sound.length = 0;
+        audio.length = 0;
+        pressedKey.length = 0;
+        coloredKey.length = 0;
+        keyCount.length = 0;
+        counter.length = 0;
+        for(var j = 0 ; j < chain; j++)
         {
-            var page = str[0]-1;
-            var num = ((str[1]-1)*keyY)+(str[2]-1);
-            sound[page][num].push(projectName+'/sounds/'+str[3]);
-            audio[page][num][keyCount[page][num]] = new Audio(sound[page][num][keyCount[page][num]]);
-            keyCount[page][num]++;
+            sound[j] = [];
+            audio[j] = [];
+            pressedKey[j] = [];
+            coloredKey[j] = [];
+            keyCount[j] = [];
+            counter[j] = [];
+            for(var i = 0 ; i < keyX*keyY; i++)
+            {
+                sound[j][i] = [];
+                audio[j][i] = [];
+                pressedKey[j][i] = 0
+                coloredKey[j][i] = "#FF0000";
+                keyCount[j][i] = 0;
+                counter[j][i] = 0;
+            }
         }
-        else continue;
-    }
+    });
 
-    keyTest.length=0;
-    for(var j = 0 ; j < chain; j++)
-    {
-        keyTest[j] = [];
-        for(var i = 0 ; i < keyX*keyY; i++)
-            keyTest[j][i] = getData(projectName+'/keyLED/'+(j+1)+' '+(parseInt(i/keyY)+1)+' '+(i%keyY+1)+' 1').split('\n');
-    }
+    getData(projectName+'/keySound', function(result){
+        var keyS = result.msg;
+        for(var i=0; i < keyS.length; i++)
+        {
+            var str = keyS[i].split(' ');
+            if(str.length == 4)
+            {
+                var page = str[0]-1;
+                var num = ((str[1]-1)*keyY)+(str[2]-1);
+                sound[page][num].push(projectName+'/sounds/'+str[3]);
+                audio[page][num][keyCount[page][num]] = new Audio(sound[page][num][keyCount[page][num]]);
+                keyCount[page][num]++;
+            }
+            else continue;
+        }
+    });
+    
+    getData(projectName+"/LEDList", function(result){
+        keyTest.length=0;
+        for(var j = 0 ; j < chain; j++)
+        {
+            keyTest[j] = [];
+            for(var i = 0 ; i < keyX*keyY; i++)
+                keyTest[j][i] = [];
+        }
+
+        LEDList = result.msg;
+
+        for(var p = 0 ; p < LEDList.length; p++)
+        {
+            (function(p){
+                var tmp = LEDList[p].split(' ');
+                getData(projectName+"/keyLED/"+LEDList[p], function(result){
+                    keyTest[parseInt(tmp[0])-1][(parseInt(tmp[1])-1)*keyX+(parseInt(tmp[2])-1)] = result.msg;
+                });
+            })(p);
+        }
+        //console.log(keyTest);
+    });
 
     autoData.length=0;
     keyColor.length=0;
-    autoData = getData(projectName+'/autoPlay').split("\n");
+
     for(var pp = 0 ; pp < velocity.length; pp++)
         keyColor[pp] = "rgba("+velocity[pp]+opacity;
+
+    getData(projectName+'/autoPlay', function(result){
+        autoData = result.msg;
+    });
 
     oriPressedKey.length=0;
     oriColoredKey.length=0;
@@ -340,16 +370,17 @@ function setProject() {
     render();
 }
 
-function getData(fName) {
-    var xmlDoc;
-    xmlhttp=new XMLHttpRequest();
-    xmlhttp.open("GET", fName, false);
-    xmlhttp.send();
-    if(xmlhttp.readyState == 4 && xmlhttp.status == 200)
-        xmlDoc=xmlhttp.responseText;
-    else
-        xmlDoc='';
-    return xmlDoc;
+function getData(fName, callback) {
+    var msg = JSON.stringify(fName);
+
+    jQuery.ajax({
+        url: url,
+        data: {'msg':msg},
+        dataType: "jsonp",
+        success: function(data){
+            callback(data);
+        }
+    });
 }
 
 function auto() {
@@ -428,23 +459,22 @@ var st;
 function keyLED1(key, tt) {
     var dur=0;
     var temp = keyTest[nowPage][key][tt];
-    if(tt < keyTest[nowPage][key].length && temp.length > 0)
+    if(tt < keyTest[nowPage][key].length)
     {
         var str = temp.split(' ');
-        if(str.length > 0)
+
+        if(str[0] == 'd' || str[0] == 'delay')
+            dur += parseInt(str[1]);
+        else if(str[0] == 'o' || str[0] == 'on')
         {
-            if(str[0] == 'd' || str[0] == 'delay')
-                dur += parseInt(str[1]);
-            else if(str[0] == 'o' || str[0] == 'on')
-            {
-                if(str[3] == 'a' || str[3] == 'auto')
-                    onLED2(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1), str[4]);
-                else
-                    onLED2(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1), str[3]);
-            }
-            else if(str[0] == 'f' || str[0] == 'off')
-                offLED(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1));
+            if(str[3] == 'a' || str[3] == 'auto')
+                onLED2(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1), str[4]);
+            else
+                onLED2(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1), str[3]);
         }
+        else if(str[0] == 'f' || str[0] == 'off')
+            offLED(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1));
+
 
         dur--;
         if(dur < 0)
