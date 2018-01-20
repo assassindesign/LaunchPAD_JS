@@ -4,7 +4,7 @@ var keyList = [65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86
     96,97,98,99,100,101,102,103,104,105,
     111,106,109,107,110,
     189,187,8,219,221,220,186,222,188,190,191,192,16];
-var url = 'http://127.0.0.1:9000';
+var url = 'http://rmrouis.iptime.org:9000';
 var velocity;
 var opacity = ",1)";
 var select, songs, LEDList;
@@ -98,11 +98,13 @@ function collides(x, y) {
             && bottom >= y
             && top <= y) {
             isCollision = rects[i];
-            if(!isNaN(audio[nowPage][i][counter[nowPage][i]].duration))
+            if(audio[nowPage][i][counter[nowPage][i]])
             {
-                //onLED(nowPage, i);
-                //setTimeout(offLED, 50, nowPage, i);
-                keyLED1(i, 0)
+                // onLED(nowPage, i);
+                // setTimeout(offLED, 50, nowPage, i);
+                console.log(audio[nowPage][i][counter[nowPage][i]])
+                if(keyTest[nowPage][i].length > 0)
+                    keyLED1(i, 0)
                 playAudio(nowPage,i);
             }
             else return null;
@@ -241,9 +243,10 @@ function Clicked(e) {
 window.addEventListener("keydown", function(e) {
     // 입력키 제외하고는 무시
     if(keyList.indexOf(e.keyCode) > -1) {
-        if(!isNaN(audio[nowPage][keyList.indexOf(e.keyCode)][counter[nowPage][keyList.indexOf(e.keyCode)]].duration))
+        if(audio[nowPage][keyList.indexOf(e.keyCode)][counter[nowPage][keyList.indexOf(e.keyCode)]])
         {
-            keyLED1(keyList.indexOf(e.keyCode), 0);
+            if(keyTest[nowPage][keyList.indexOf(e.keyCode)].length > 0)
+                keyLED1(keyList.indexOf(e.keyCode), 0);
             playAudio(nowPage, keyList.indexOf(e.keyCode));
         }
         e.preventDefault();
@@ -284,6 +287,7 @@ function setProject() {
         coloredKey.length = 0;
         keyCount.length = 0;
         counter.length = 0;
+        keyTest.length=0;
         for(var j = 0 ; j < chain; j++)
         {
             sound[j] = [];
@@ -292,6 +296,7 @@ function setProject() {
             coloredKey[j] = [];
             keyCount[j] = [];
             counter[j] = [];
+            keyTest[j] = [];
             for(var i = 0 ; i < keyX*keyY; i++)
             {
                 sound[j][i] = [];
@@ -300,6 +305,7 @@ function setProject() {
                 coloredKey[j][i] = "#FF0000";
                 keyCount[j][i] = 0;
                 counter[j][i] = 0;
+                keyTest[j][i] = [];
             }
         }
     });
@@ -322,14 +328,6 @@ function setProject() {
     });
     
     getData(projectName+"/LEDList", function(result){
-        keyTest.length=0;
-        for(var j = 0 ; j < chain; j++)
-        {
-            keyTest[j] = [];
-            for(var i = 0 ; i < keyX*keyY; i++)
-                keyTest[j][i] = [];
-        }
-
         LEDList = result.msg;
 
         for(var p = 0 ; p < LEDList.length; p++)
@@ -337,11 +335,10 @@ function setProject() {
             (function(p){
                 var tmp = LEDList[p].split(' ');
                 getData(projectName+"/keyLED/"+LEDList[p], function(result){
-                    keyTest[parseInt(tmp[0])-1][(parseInt(tmp[1])-1)*keyX+(parseInt(tmp[2])-1)] = result.msg;
+                    keyTest[parseInt(tmp[0])-1][(parseInt(tmp[1])-1)*keyX+(parseInt(tmp[2])-1)].push(result.msg);
                 });
             })(p);
         }
-        //console.log(keyTest);
     });
 
     autoData.length=0;
@@ -367,7 +364,8 @@ function setProject() {
         }
     }
 
-    render();
+    stopT();
+    initz();
 }
 
 function getData(fName, callback) {
@@ -384,6 +382,7 @@ function getData(fName, callback) {
 }
 
 function auto() {
+    console.log(keyTest);
     stopT();
     autoP = true;
     autoProcess(0);
@@ -409,11 +408,13 @@ function autoProcess(tt) {
             dur += parseInt(temp[1]);
         else if(temp[0] == 'o')
         {
-            keyLED1((parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1), 0)
+            if(keyTest[nowPage][(parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1)].length > 0)
+                keyLED1((parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1), 0);
+            //onLED(nowPage, (parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1))
             playAudio(nowPage, (parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1));
         }
         else if(temp[0] == 'f')
-            keyLED2(((parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1), 0))
+            //offLED(nowPage, (parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1));
 
         dur--;
         if(dur < 0)
@@ -458,23 +459,23 @@ var st;
 //LED 활성화를 위한 함수
 function keyLED1(key, tt) {
     var dur=0;
-    var temp = keyTest[nowPage][key][tt];
-    if(tt < keyTest[nowPage][key].length)
+
+    var temp = keyTest[nowPage][key][counter[nowPage][key]][tt];
+    if(tt < keyTest[nowPage][key][counter[nowPage][key]].length)
     {
         var str = temp.split(' ');
 
-        if(str[0] == 'd' || str[0] == 'delay')
-            dur += parseInt(str[1]);
-        else if(str[0] == 'o' || str[0] == 'on')
-        {
-            if(str[3] == 'a' || str[3] == 'auto')
-                onLED2(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1), str[4]);
-            else
-                onLED2(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1), str[3]);
+        if(str.length > 0) {
+            if(str[0] == 'd' || str[0] == 'delay')
+                dur += parseInt(str[1]);
+            else if(str[0] == 'o' || str[0] == 'on')
+                if(str[3] == 'a' || str[3] == 'auto')
+                    onLED2(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1), str[4]);
+                else
+                    onLED2(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1), str[3]);
+            else if(str[0] == 'f' || str[0] == 'off')
+                offLED(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1));
         }
-        else if(str[0] == 'f' || str[0] == 'off')
-            offLED(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1));
-
 
         dur--;
         if(dur < 0)
@@ -489,12 +490,12 @@ function keyLED1(key, tt) {
 
 //LED 비활성화를 위한 함수
 function keyLED2(key, tt) {
-    var temp = keyTest[nowPage][key][tt];
-    if(tt < keyTest[nowPage][key].length && temp.length > 0)
+    var temp = keyTest[nowPage][key][counter[nowPage][key]][tt];
+    if(tt < keyTest[nowPage][key][counter[nowPage][key]].length && temp.length > 0)
     {
         var str = temp.split(' ');
         if(str.length > 0)
-            if(str[0] == 'o' || str[0] == 'f')
+            if(str[0] == 'o' || str[0] == 'f' || str[0] == 'on' || str[0] == 'off')
                 offLED(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1));
 
         keyLED2(key, tt+1);
