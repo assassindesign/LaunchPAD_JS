@@ -1,8 +1,14 @@
 # LaunchPAD_JS
 LaunchPAD on JavaScript
 
+Installation
+
+	must install python 3 and flask, flask_restful, functool for server and logging for debugging
+	pip install flask, pip install flask_restful...
+
 Usage
 
+	use python 3, "python LaunchpadJS_serv.py" then server on
 	in SelectBox, choose Unipack name (ex: faded, dont let me down, k-pop culture)
  	then you can autoplay or click, button input
   
