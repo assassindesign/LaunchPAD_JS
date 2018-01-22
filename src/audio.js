@@ -1,10 +1,10 @@
-// ¹öÆ° ¸®½ºÆ® 
+// ï¿½ï¿½Æ° ï¿½ï¿½ï¿½ï¿½Æ® 
 var keyList = [65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,
     49,50,51,52,53,54,55,56,57,48,32,
     96,97,98,99,100,101,102,103,104,105,
     111,106,109,107,110,
     189,187,8,219,221,220,186,222,188,190,191,192,16];
-var url = 'http://rmrouis.iptime.org:9000';
+var url = 'http://127.0.0.1:9000';
 var velocity;
 var opacity = ",1)";
 var select, songs, LEDList;
@@ -49,6 +49,7 @@ $(function() {
 
     getData("./Velocity", function(result){
         velocity = result.msg;
+        document.getElementById("Velocity").innerText="Velocity:Loaded";
     });
 
     for(var j = 0 ; j < chain; j++)
@@ -71,14 +72,14 @@ $(function() {
     }
 });
 
-// Äµ¹ö½º Å©±â Á¶Á¤
+// Äµï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 function cnv2Resize() {
     canvas.width = window.innerWidth*19/20;
     canvas.height = window.innerHeight*19/20;
     render();
 }
 
-// È­¸é ¸®»çÀÌÁî ÀÌº¥Æ®
+// È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ®
 window.onload = function() {
     cnv2Resize();
     window.addEventListener('resize',function(){
@@ -87,7 +88,7 @@ window.onload = function() {
     }, false);
 }
 
-// ¸¶¿ì½º Å¬¸¯(À½¿ø ¹öÆ°)
+// ï¿½ï¿½ï¿½ì½º Å¬ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ°)
 function collides(x, y) {
     var isCollision = false;
     for (var i = 0, len = rects.length; i < len; i++) {
@@ -113,7 +114,7 @@ function collides(x, y) {
     return isCollision;
 }
 
-// ¸¶¿ì½º Å¬¸¯(ÆäÀÌÁö ¹öÆ°)
+// ï¿½ï¿½ï¿½ì½º Å¬ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ°)
 function collides2(x, y) {
     var isCollision = false;
     for (var i = 0, len = cirs.length; i < len; i++) {
@@ -131,7 +132,7 @@ function collides2(x, y) {
     return isCollision;
 }
 
-// Å° ÀÔ·Â ÀÌº¥Æ®
+// Å° ï¿½Ô·ï¿½ ï¿½Ìºï¿½Æ®
 var keysDown = {};
 window.addEventListener('keydown', function(e) {
     keysDown[e.keyCode] = true;
@@ -140,7 +141,7 @@ window.addEventListener('keyup', function(e) {
     delete keysDown[e.keyCode];
 });
 
-// È­¸é ±âÃÊ ·£´õ¸µ
+// È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 function render() {
     if(canvas && canvas.getContext) {
         ctx.shadowBlur=0;
@@ -241,7 +242,7 @@ function Clicked(e) {
 }
 
 window.addEventListener("keydown", function(e) {
-    // ÀÔ·ÂÅ° Á¦¿ÜÇÏ°í´Â ¹«½Ã
+    // ï¿½Ô·ï¿½Å° ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     if(keyList.indexOf(e.keyCode) > -1) {
         if(audio[nowPage][keyList.indexOf(e.keyCode)][counter[nowPage][keyList.indexOf(e.keyCode)]])
         {
@@ -264,9 +265,17 @@ function playAudio(page, key) {
 
 var keyTest = [];
 
+function LoadingStatus(){
+    document.getElementById("Info").innerTex="Info:Loading";
+    document.getElementById("KeySound").innerText="KeySound:Loading";
+    document.getElementById("LEDList").innerText="LEDList:Loading";
+    document.getElementById("AutoData").innerText="AutoData:Loading";
+}
+
 function setProject() {
     projectName = songs[select.selectedIndex];
     nowPage = 0;
+    LoadingStatus();
 
     getData(projectName+'/info', function(result){
         info = result.msg;
@@ -308,6 +317,7 @@ function setProject() {
                 keyTest[j][i] = [];
             }
         }
+        document.getElementById("Info").innerText="Info:Loaded";
     });
 
     getData(projectName+'/keySound', function(result){
@@ -325,6 +335,7 @@ function setProject() {
             }
             else continue;
         }
+        document.getElementById("KeySound").innerText="KeySound:Loaded";
     });
     
     getData(projectName+"/LEDList", function(result){
@@ -339,6 +350,7 @@ function setProject() {
                 });
             })(p);
         }
+        document.getElementById("LEDList").innerText="LEDList:Loaded";
     });
 
     autoData.length=0;
@@ -349,6 +361,7 @@ function setProject() {
 
     getData(projectName+'/autoPlay', function(result){
         autoData = result.msg;
+        document.getElementById("AutoData").innerText="AutoData:Loaded";
     });
 
     oriPressedKey.length=0;
@@ -456,7 +469,7 @@ function offLED(page, key)
 
 var st;
 
-//LED È°¼ºÈ­¸¦ À§ÇÑ ÇÔ¼ö
+//LED È°ï¿½ï¿½È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
 function keyLED1(key, tt) {
     var dur=0;
 
@@ -488,7 +501,7 @@ function keyLED1(key, tt) {
     }
 }
 
-//LED ºñÈ°¼ºÈ­¸¦ À§ÇÑ ÇÔ¼ö
+//LED ï¿½ï¿½È°ï¿½ï¿½È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
 function keyLED2(key, tt) {
     var temp = keyTest[nowPage][key][counter[nowPage][key]][tt];
     if(tt < keyTest[nowPage][key][counter[nowPage][key]].length && temp.length > 0)
