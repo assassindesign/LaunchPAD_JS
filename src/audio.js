@@ -310,6 +310,7 @@ function LoadingStatus(){
 }
 
 function setProject() {
+    stopT();
     projectName = songs[select.selectedIndex];
     nowPage = 0;
     LoadingStatus();
