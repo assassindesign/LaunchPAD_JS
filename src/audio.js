@@ -4,7 +4,7 @@ var keyList = [65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86
     96,97,98,99,100,101,102,103,104,105,
     111,106,109,107,110,
     189,187,8,219,221,220,186,222,188,190,191,192,16];
-var url = 'http://127.0.0.1:9000';
+var url = 'http://rmrouis.iptime.org:9000';
 var velocity;
 var opacity = ",1)";
 var select, songs, LEDList;
@@ -141,7 +141,7 @@ function collides(x, y) {
                 // setTimeout(offLED, 50, nowPage, i);
                 console.log(audio[nowPage][i][counter[nowPage][i]])
                 if(keyTest[nowPage][i].length > 0)
-                    keyLED1(i, 0)
+                    keyLED1(i, counter[nowPage][i], 0)
                 playAudio(nowPage,i);
             }
             else return null;
@@ -282,9 +282,10 @@ window.addEventListener("keydown", function(e) {
     if(keyList.indexOf(e.keyCode) > -1) {
         if(audio[nowPage][keyList.indexOf(e.keyCode)][counter[nowPage][keyList.indexOf(e.keyCode)]])
         {
-            if(keyTest[nowPage][keyList.indexOf(e.keyCode)].length > 0)
-                keyLED1(keyList.indexOf(e.keyCode), 0);
-            playAudio(nowPage, keyList.indexOf(e.keyCode));
+            var keyNum = keyList.indexOf(e.keyCode);
+            if(keyTest[nowPage][keyNum].length > 0)
+                keyLED1(keyNum, counter[nowPage][keyNum], 0);
+            playAudio(nowPage, keyNum);
         }
         e.preventDefault();
     }
@@ -296,7 +297,7 @@ function playAudio(page, key) {
         if(audio[page][key][counter[page][key]].currentTime > 0)
             audio[page][key][counter[page][key]].currentTime = 0;
         audio[page][key][counter[page][key]].play();
-        counter[page][key] = ++counter[page][key]%keyCount[page][key];
+        counter[page][key] = (counter[page][key]+1)%keyCount[page][key];
     }
 }
 
@@ -460,10 +461,11 @@ function autoProcess(tt) {
             dur += parseInt(temp[1]);
         else if(temp[0] == 'o')
         {
-            if(keyTest[nowPage][(parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1)].length > 0)
-                keyLED1((parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1), 0);
+            var keyNum = (parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1);
+            if(keyTest[nowPage][keyNum].length > 0)
+                keyLED1(keyNum, counter[nowPage][keyNum], 0);
             //onLED(nowPage, (parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1))
-            playAudio(nowPage, (parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1));
+            playAudio(nowPage, keyNum);
         }
         else if(temp[0] == 'f')
             //offLED(nowPage, (parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1));
@@ -509,11 +511,16 @@ function offLED(page, key)
 var st;
 
 //LED Ȱ��ȭ�� ���� �Լ�
-function keyLED1(key, tt) {
+function keyLED1(key, cnt, tt) {
     var dur=0;
 
-    var temp = keyTest[nowPage][key][counter[nowPage][key]][tt];
-    if(tt < keyTest[nowPage][key][counter[nowPage][key]].length)
+    var temp = keyTest[nowPage][key][cnt];
+    if(typeof temp == 'undefined')
+        cnt = 0;
+    
+    temp = keyTest[nowPage][key][cnt][tt];
+
+    if(tt < keyTest[nowPage][key][cnt].length)
     {
         var str = temp.split(' ');
 
@@ -534,9 +541,9 @@ function keyLED1(key, tt) {
             dur = 0;
 
         if(dur >= 1)
-            st = setTimeout(keyLED1,dur,key,tt+1);
+            st = setTimeout(keyLED1,dur,key,cnt,tt+1);
         else
-            keyLED1(key, tt+1);
+            keyLED1(key, cnt, tt+1);
     }
 }
 
