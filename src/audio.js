@@ -1,10 +1,11 @@
-﻿// ��ư ����Ʈ 
+// ��ư ����Ʈ 
 var keyList = [65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,
     49,50,51,52,53,54,55,56,57,48,32,
     96,97,98,99,100,101,102,103,104,105,
     111,106,109,107,110,
     189,187,8,219,221,220,186,222,188,190,191,192,16];
 var url = 'http://127.0.0.1:9000';
+var mobile = false;
 var velocity;
 var opacity = ",1)";
 var select, songs, LEDList;
@@ -31,6 +32,7 @@ var keyX = 8, keyY = 8;
 var timer;
 var autoP = false;
 
+//Script for Array Initialization
 if (!Array.prototype.fill) {
     Object.defineProperty(Array.prototype, 'fill', {
         value: function(value) {
@@ -69,6 +71,21 @@ if (!Array.prototype.fill) {
 
 // initialization
 $(function() {
+    var filter = "win16|win32|win64|mac";
+
+    if(navigator.platform){
+        if(0 > filter.indexOf(navigator.platform.toLowerCase())){
+            //alert("Mobile");
+            mobile = true;
+            document.getElementById("Env").innerText = "Mobile";
+        }
+        else{
+            //alert("PC");
+            mobile = false;
+            document.getElementById("Env").innerText = "PC";
+        }
+    }
+
     canvas = document.getElementById('canv');
     ctx = canvas.getContext('2d');
 
@@ -112,7 +129,17 @@ $(function() {
 function cnv2Resize() {
     canvas.width = window.innerWidth*19/20;
     canvas.height = window.innerHeight*19/20;
+
     render();
+
+    if(!mobile) {
+        canvas.removeEventListener('click', Clicked, false);
+        canvas.addEventListener('click', Clicked, false);
+    }
+    else {
+        canvas.removeEventListener('touchstart', Touched);
+        canvas.addEventListener('touchstart', Touched);
+    }
 }
 
 // ȭ�� �������� �̺�Ʈ
@@ -139,7 +166,9 @@ function collides(x, y) {
             {
                 // onLED(nowPage, i);
                 // setTimeout(offLED, 50, nowPage, i);
-                console.log(audio[nowPage][i][counter[nowPage][i]])
+                console.log(audio[nowPage][i][counter[nowPage][i]]);
+                console.log(keyTest[nowPage][i]);
+                //audio[nowPage][i][counter[nowPage][i]].load();
                 if(keyTest[nowPage][i].length > 0)
                     keyLED1(i, counter[nowPage][i], 0)
                 playAudio(nowPage,i);
@@ -194,7 +223,7 @@ function render() {
         ctx.fillRect(cornerRad/2, cornerRad/2, canvas.width-cornerRad, canvas.height-cornerRad);
 
         for(var i = 0 ; i < (keyX*keyY); i++){
-            rects[i] = {x: (canvas.width/2-(keyX/2)*siz/(keyX+2))+siz*(i%keyX)/(keyX+2), y: (canvas.height/2-(keyY/2)*siz/(keyY+2))+siz*parseInt(i/keyY)/(keyY+2), w: siz/(keyX+3), h: siz/(keyY+3)};
+            rects[i] = {x: (canvas.width/2-(keyX/2)*siz/(keyX+1))+siz*(i%keyX)/(keyX+2), y: (canvas.height/2-(keyY/2)*siz/(keyY+2))+siz*parseInt(i/keyY)/(keyY+2), w: siz/(keyX+3), h: siz/(keyY+3)};
         }
         
         if(ctx) {
@@ -223,8 +252,6 @@ function render() {
                 ctx.fill();
                 ctx.stroke();
             }
-            canvas.removeEventListener('click', Clicked, false);
-            canvas.addEventListener('click', Clicked, false);
         }
     }
 }
@@ -264,17 +291,19 @@ function animate(key){
     }
 }
 
-function Clicked(e) {
-    //console.log('click: ' + e.offsetX + '/' + e.offsetY);
-    var rect = collides(e.offsetX, e.offsetY);
-    var cir = collides2(e.offsetX, e.offsetY);
-    if(rect) {
-        //console.log('collision1: '+rect.x+'/'+rect.y);
-    } else if(cir) {
-        //console.log('collision2: '+rect.x+'/'+rect.y);
-    } else {
-        //console.log('no collision');
+function Touched(ev){
+    var touch;
+    touch = ev.touches;
+    for(ii = 0 ; ii < touch.length; ii++)
+    {
+        collides(touch[ii].pageX, touch[ii].pageY);
+        collides2(touch[ii].pageX, touch[ii].pageY);
     }
+}
+
+function Clicked(e) {
+    collides(e.offsetX, e.offsetY);
+    collides2(e.offsetX, e.offsetY);
 }
 
 window.addEventListener("keydown", function(e) {
@@ -294,9 +323,12 @@ window.addEventListener("keydown", function(e) {
 function playAudio(page, key) {
     if(audio[page][key][counter[page][key]])
     {
-        if(audio[page][key][counter[page][key]].currentTime > 0)
-            audio[page][key][counter[page][key]].currentTime = 0;
-        audio[page][key][counter[page][key]].play();
+        console.log(audio[page][key][counter[page][key]]);
+        //audio[page][key][counter[page][key]].load();
+        //if(audio[page][key][counter[page][key]].currentTime > 0)
+            //audio[page][key][counter[page][key]].currentTime = 0;
+        //audio[page][key][counter[page][key]].play();
+        createjs.Sound.play(audio[page][key][counter[page][key]]);
         counter[page][key] = (counter[page][key]+1)%keyCount[page][key];
     }
 }
@@ -367,10 +399,11 @@ function setProject() {
             var str = keyS[i].split(' ');
             if(str.length == 4)
             {
-                var page = str[0]-1;
-                var num = ((str[1]-1)*keyY)+(str[2]-1);
+                var page = parseInt(str[0])-1;
+                var num = ((parseInt(str[1])-1)*keyY)+(parseInt(str[2])-1);
                 sound[page][num].push(projectName+'/sounds/'+str[3]);
-                audio[page][num][keyCount[page][num]] = new Audio(sound[page][num][keyCount[page][num]]);
+                audio[page][num][keyCount[page][num]] = str[3];//new Audio(sound[page][num][keyCount[page][num]]);
+                createjs.Sound.registerSound(sound[page][num][keyCount[page][num]], audio[page][num][keyCount[page][num]]);
                 keyCount[page][num]++;
             }
             else continue;
@@ -386,7 +419,12 @@ function setProject() {
             (function(p){
                 var tmp = LEDList[p].split(' ');
                 getData(projectName+"/keyLED/"+LEDList[p], function(result){
-                    keyTest[parseInt(tmp[0])-1][(parseInt(tmp[1])-1)*keyX+(parseInt(tmp[2])-1)].push(result.msg);
+
+                    var pNum = parseInt(tmp[0])-1;
+                    var keyNum = (parseInt(tmp[1])-1)*keyX+(parseInt(tmp[2])-1);
+                    keyTest[pNum][keyNum].push(result.msg);
+                    for(ir=0; ir<parseInt(tmp[3])-1; ir++)
+                        keyTest[pNum][keyNum][0] = keyTest[pNum][keyNum][0].concat(result.msg);
                 });
             })(p);
         }
@@ -519,7 +557,7 @@ function keyLED1(key, cnt, tt) {
         cnt = 0;
     
     temp = keyTest[nowPage][key][cnt][tt];
-
+    
     if(tt < keyTest[nowPage][key][cnt].length)
     {
         var str = temp.split(' ');
