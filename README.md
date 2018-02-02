@@ -21,15 +21,23 @@ LaunchPAD on JavaScript
 	http://rmrouis.iptime.org:20000/audio.html
 
 # Video
-	Version1 Click▼
+	Version0.1 Click▼
 [![LPSJ](https://github.com/rouismia/LaunchPAD_JS/blob/master/GIF4.gif?raw=true)](https://www.youtube.com/watch?v=VlBlGmsLa2A&feature=youtu.be "LPSJ")
 
-	Version2 Click▼
+	Version0.2 Click▼
 [![LPSJ_2](https://github.com/rouismia/LaunchPAD_JS/blob/master/GIF.gif?raw=true)](https://www.youtube.com/watch?v=qfbsu-vFfRY "LPSJ_2")
 
-	Version3 Click▼
+	Version0.3 Click▼
 [![LPSJ_3](https://github.com/rouismia/LaunchPAD_JS/blob/master/GIF2.gif?raw=true)](https://www.youtube.com/watch?v=qfbsu-vFfRY "LPSJ_3")
 
+	Version1.0 IOS_1 Click▼
+[![LPSJ_4](https://github.com/rouismia/LaunchPAD_JS/blob/V_1.0/img/IOS_1.gif?raw=true)](https://www.youtube.com/watch?v=YS6vnCHq0UE "LPSJ_4")
+
+	Version1.0 IOS_2 Click▼
+[![LPSJ_5](https://github.com/rouismia/LaunchPAD_JS/blob/V_1.0/img/IOS_2.gif?raw=true)](https://www.youtube.com/watch?v=HLqTAC-xV54 "LPSJ_4")
+
+	Version1.0 Android Click▼
+[![LPSJ_6](https://github.com/rouismia/LaunchPAD_JS/blob/V_1.0/img/Android.gif?raw=true)](https://www.youtube.com/watch?v=3_J87RzH0CA "LPSJ_4")
 
 # Used API
 
