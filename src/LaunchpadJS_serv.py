@@ -1,5 +1,6 @@
 import os
 import codecs
+import glob
 
 from flask import Flask
 from flask import json, jsonify
@@ -22,8 +23,8 @@ fDir = getFile("./")
 for dir1 in fDir:
     if os.path.isdir(dir1):
         fd.write(dir1+'\n')
-        fd2 = codecs.open(dir1+"/LEDList","w","utf-8")
-        fDir2 = getFile(dir1+"/keyLED")
+        fd2 = codecs.open(os.path.join(dir1, "LEDList"),"w","utf-8")
+        fDir2 = getFile(os.path.join(dir1, "keyLED"))
         for dir2 in fDir2:
             fname, ext = os.path.splitext(dir2)
             if not ext:
@@ -32,6 +33,11 @@ for dir1 in fDir:
 fd.close()
 
 def getData(name):
+    tmp = os.path.split(name)
+    tmp2 = getFile(tmp[0])
+    for fname in tmp2:
+        if fname.lower() == tmp[1].lower():
+            name = os.path.join(tmp[0],fname)
     f = codecs.open(name, "r", "utf-8")
     lines = f.read().splitlines()
     f.close()
