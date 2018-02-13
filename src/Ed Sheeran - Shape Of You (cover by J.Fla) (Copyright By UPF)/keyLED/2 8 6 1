@@ -1,0 +1,32 @@
+
+o 7 6 auto 5
+o 8 7 auto 5
+o 8 5 auto 5
+o 8 6 auto 5
+d 55
+o 8 5 auto 9
+o 8 6 auto 9
+o 8 7 auto 9
+o 7 6 auto 9
+d 55
+o 8 5 auto 13
+o 8 6 auto 13
+o 8 7 auto 13
+o 7 6 auto 13
+d 55
+o 7 6 auto 37
+o 8 6 auto 37
+o 8 5 auto 37
+o 8 5 auto 37
+o 8 7 auto 37
+d 55
+o 7 6 auto 45
+o 8 6 auto 45
+o 8 5 auto 45
+o 8 7 auto 45
+d 55
+f 7 6
+f 7 6
+f 8 6
+f 8 7
+f 8 5

@@ -1,0 +1,61 @@
+
+o 6 5 auto 5
+o 5 5 auto 5
+o 6 6 auto 5
+o 7 5 auto 5
+o 6 4 auto 5
+o 6 3 auto 5
+o 4 5 auto 5
+o 6 7 auto 5
+o 8 5 auto 5
+d 68
+o 4 5 auto 9
+o 5 5 auto 9
+o 6 5 auto 9
+o 7 5 auto 9
+o 8 5 auto 9
+o 6 6 auto 9
+o 6 7 auto 9
+o 6 4 auto 9
+o 6 3 auto 9
+d 68
+o 6 3 auto 13
+o 6 4 auto 13
+o 6 5 auto 13
+o 6 6 auto 13
+o 6 7 auto 13
+o 5 5 auto 13
+o 4 5 auto 13
+o 7 5 auto 13
+o 8 5 auto 13
+d 68
+o 6 3 auto 37
+o 6 4 auto 37
+o 6 5 auto 37
+o 6 6 auto 37
+o 6 7 auto 37
+o 5 5 auto 37
+o 4 5 auto 37
+o 7 5 auto 37
+o 8 5 auto 37
+d 68
+o 6 3 auto 45
+o 6 4 auto 45
+o 6 5 auto 45
+o 5 5 auto 45
+o 4 5 auto 45
+o 6 6 auto 45
+o 6 6 auto 45
+o 6 7 auto 45
+o 7 5 auto 45
+o 8 5 auto 45
+d 68
+f 4 5
+f 5 5
+f 6 5
+f 7 5
+f 8 5
+f 6 4
+f 6 3
+f 6 6
+f 6 7

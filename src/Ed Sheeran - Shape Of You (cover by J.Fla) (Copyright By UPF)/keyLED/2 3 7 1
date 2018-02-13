@@ -1,0 +1,46 @@
+
+o 1 7 auto 5
+o 3 8 auto 5
+d 45
+o 2 7 auto 5
+o 3 7 auto 5
+d 45
+o 3 6 auto 5
+d 45
+o 4 7 auto 5
+o 3 5 auto 5
+d 45
+o 3 4 auto 5
+o 5 7 auto 5
+d 45
+o 3 3 auto 5
+o 6 7 auto 5
+d 45
+o 3 2 auto 5
+o 7 7 auto 5
+d 45
+o 3 1 auto 5
+o 8 7 auto 5
+f 1 7
+f 3 8
+d 45
+f 2 7
+f 3 7
+d 45
+f 3 6
+d 45
+f 3 7
+f 4 7
+f 3 5
+d 45
+f 3 4
+f 5 7
+d 45
+f 3 3
+f 6 7
+d 45
+f 3 2
+f 7 7
+d 45
+f 3 1
+f 8 7

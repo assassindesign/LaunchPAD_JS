@@ -1,0 +1,50 @@
+
+o 1 6 auto 3
+o 2 6 auto 3
+o 3 6 auto 3
+o 4 6 auto 3
+o 5 3 auto 3
+o 6 3 auto 3
+o 7 3 auto 3
+o 8 3 auto 3
+d 30
+o 7 4 auto 3
+o 6 2 auto 2
+o 5 2 auto 2
+o 7 3 auto 2
+o 7 4 auto 2
+o 4 7 auto 2
+o 3 7 auto 2
+o 2 5 auto 2
+o 2 6 auto 2
+f 6 3
+f 5 3
+f 8 3
+f 1 6
+f 3 6
+f 4 6
+d 30
+o 6 1 auto 3
+o 6 3 auto 3
+o 6 4 auto 3
+o 3 5 auto 3
+o 3 6 auto 3
+o 3 8 auto 3
+o 6 2 auto 3
+o 3 7 auto 3
+d 30
+f 5 2
+f 7 3
+f 7 4
+f 4 7
+f 2 6
+f 2 5
+d 800
+f 6 1
+f 6 2
+f 6 3
+f 6 4
+f 3 5
+f 3 6
+f 3 7
+f 3 8

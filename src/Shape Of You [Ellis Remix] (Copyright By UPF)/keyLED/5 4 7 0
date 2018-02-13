@@ -1,0 +1,3 @@
+on 4 7 auto 3
+delay 10
+off 4 7

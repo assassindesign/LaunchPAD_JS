@@ -1,0 +1,46 @@
+
+o 8 8 auto 45
+d 45
+o 7 8 auto 45
+d 45
+o 6 8 auto 45
+o 8 8 auto 37
+d 45
+o 7 8 auto 37
+o 5 8 auto 45
+d 45
+o 4 8 auto 45
+o 6 8 auto 37
+o 8 8 auto 49
+d 45
+o 7 8 auto 49
+o 5 8 auto 37
+o 3 8 auto 45
+d 45
+o 2 8 auto 45
+o 4 8 auto 37
+o 6 8 auto 49
+f 8 8
+d 45
+f 7 8
+o 5 8 auto 49
+o 3 8 auto 37
+o 1 8 auto 45
+d 45
+f 6 8
+o 4 8 auto 49
+o 2 8 auto 37
+d 45
+f 5 8
+o 1 8 auto 37
+o 3 8 auto 49
+d 45
+f 4 8
+o 2 8 auto 49
+d 45
+f 3 8
+o 1 8 auto 49
+f 2 8
+f 2 8
+d 45
+f 1 8

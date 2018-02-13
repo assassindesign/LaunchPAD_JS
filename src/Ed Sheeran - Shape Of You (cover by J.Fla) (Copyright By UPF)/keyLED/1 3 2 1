@@ -1,0 +1,47 @@
+
+o 1 2 auto 45
+d 45
+o 2 2 auto 45
+d 45
+o 3 2 auto 45
+o 1 2 auto 37
+d 45
+o 2 2 auto 37
+o 4 2 auto 45
+d 45
+o 4 2 auto 45
+o 5 2 auto 45
+o 3 2 auto 37
+o 1 2 auto 49
+d 45
+o 6 2 auto 45
+o 4 2 auto 37
+o 2 2 auto 49
+d 45
+o 3 2 auto 49
+f 1 2
+o 7 2 auto 45
+o 5 2 auto 37
+d 45
+f 2 2
+o 6 2 auto 37
+o 8 2 auto 45
+o 4 2 auto 49
+d 45
+f 3 2
+o 5 2 auto 49
+o 7 2 auto 37
+d 45
+f 4 2
+o 8 2 auto 37
+o 6 2 auto 49
+d 45
+f 5 2
+o 7 2 auto 49
+d 45
+f 6 2
+o 8 2 auto 49
+d 45
+f 7 2
+d 30
+f 8 2
