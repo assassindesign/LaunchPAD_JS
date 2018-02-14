@@ -1,40 +1,41 @@
-// on 8x8, list of keyboard matching buttons list
+// ��ư ����Ʈ 
 var keyList = [65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,
     49,50,51,52,53,54,55,56,57,48,32,
     96,97,98,99,100,101,102,103,104,105,
     111,106,109,107,110,
     189,187,8,219,221,220,186,222,188,190,191,192,16];
-var url = 'http://127.0.0.1:9000'; //server address
-var mobile = false;                         //mobile status identifier
-var velocity;                               //color number
-var opacity = ",1)";                        //opacity postfix
-var select, songs, LEDList;                 //selected song, song list, song's LED list
-var keyColor = [];                          //button velocity
-var pressedKey = [];                        //pressing status idf
-var coloredKey = [];                        //button LED Color
-var oriPressedKey = [];                     
-var oriColoredKey = [];                     //arr for init keys
-var keyCount = [];                          //number of same button's sample
-var counter = [];                           //press counter
-var baseColor = "#FFFFFF";                  //base Color, dark gray
-var strokeColor = "rgba(255,255,255,0.6)";  //outer of button color, light gray
-var sound = [];                             //sample's url
-var audio = [];                             //audio obj
-var audioInstance = [];                     //arr for control audio obj
-var autoData = [];                          //auto process data
-var cirs = [];                              //page button position
-var cirs2 = [];                             //page button obj
-var rects = [];                             //button obj
-var anim = [];                              //button LED animation arr
-var canvas;                                 
+var url = 'http://127.0.0.1:9000';
+var mobile = false;
+var velocity;
+var opacity = ",1)";
+var select, songs, LEDList;
+var keyColor = [];
+var pressedKey = [];
+var coloredKey = [];
+var oriPressedKey = [];
+var oriColoredKey = [];
+var keyCount = [];
+var counter = [];
+var baseColor = "#FFFFFF";
+var strokeColor = "rgba(255,255,255,0.6)";
+var sound = [];
+var audio = [];
+var audioInstance = [];
+var autoData = [];
+var cirs = [];
+var cirs2 = [];
+var rects = [];
+var canvas;
+var ctx;
 var nowPage = 0;
-var projectName;                            //Song name
-var chain = 6;                              //Number of pages
-var keyX = 8, keyY = 8;                     //Number of button
-var timer;                                  //var for dynamic canvas size
-var autoP = false;                          //auto process status
-var stage;                                  //var for easelJS canvas control
-var st;                                     //setTimer var
+var projectName;
+var chain = 6;
+var keyX = 8, keyY = 8;
+var timer;
+var autoP = false;
+var stage;
+var anim = [];
+var st;
 
 //Script for Array Initialization
 if (!Array.prototype.fill) {
@@ -73,11 +74,10 @@ if (!Array.prototype.fill) {
     });
 }
 
-// Application initialization
+// initialization
 $(function() {
     var filter = "win16|win32|win64|mac";
 
-    // on mobile env, for support multi touch, identify device status
     if(navigator.platform){
         if(0 > filter.indexOf(navigator.platform.toLowerCase())){
             //alert("Mobile");
@@ -92,6 +92,7 @@ $(function() {
     }
 
     canvas = document.getElementById('canv');
+    ctx = canvas.getContext('2d');
     stage = new createjs.Stage("canv");
 
     select = document.getElementById("Selector");
@@ -110,10 +111,24 @@ $(function() {
         document.getElementById("Velocity").innerText="Velocity:Loaded";
     });
 
-    arrinit();
-
-    createjs.Ticker.on("tick", animate);
-    createjs.Ticker.framerate = 60;
+    for(var j = 0 ; j < chain; j++)
+    {
+        sound[j] = [];
+        audio[j] = [];
+        pressedKey[j] = [];
+        coloredKey[j] = [];
+        keyCount[j] = [];
+        counter[j] = [];
+        for(var i = 0 ; i < keyX*keyY; i++)
+        {
+            sound[j][i] = [];
+            audio[j][i] = [];
+            pressedKey[j][i] = 0
+            coloredKey[j][i] = "#FF0000";
+            keyCount[j][i] = 0;
+            counter[j][i] = 0;
+        }
+    }
 });
 
 function cnv2Resize() {
@@ -192,69 +207,154 @@ window.addEventListener('keyup', function(e) {
 });
 
 function render() {
-    if(canvas && stage){
-        stage.removeAllChildren();
-        stage.clear();
-
+    if(canvas && canvas.getContext) {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.shadowBlur=0;
+        ctx.shadowColor="transparent";
         var siz = canvas.width > canvas.height ? canvas.height : canvas.width;
         var cornerRad = siz/(keyX*keyY);
 
-        bg = new createjs.Shape();
-        bg.graphics.beginFill("#444444");
-        bg.graphics.drawRoundRect(cornerRad/2, cornerRad/2, canvas.width-cornerRad, canvas.height-cornerRad, cornerRad);
-        stage.addChild(bg);
+
+        ctx.fillStyle="#444444";
+        ctx.strokeStyle="#444444";
+        ctx.lineJoin = "round";
+        ctx.lineWidth = cornerRad/(keyY*0.15);
+        ctx.strokeRect(cornerRad/2, cornerRad/2, canvas.width-cornerRad, canvas.height-cornerRad);
+        ctx.fillRect(cornerRad/2, cornerRad/2, canvas.width-cornerRad, canvas.height-cornerRad);
 
         for(var i = 0 ; i < (keyX*keyY); i++){
             rects[i] = {x: (canvas.width/2-(keyX/2)*siz/(keyX+1))+siz*(i%keyX)/(keyX+2), y: (canvas.height/2-(keyY/2)*siz/(keyY+2))+siz*parseInt(i/keyY)/(keyY+2), w: siz/(keyX+3), h: siz/(keyY+3)};
         }
-
-        for(var i = 0 ; i < chain; i++){
-            cirs[i] = {x: rects[(i+1)*keyX-1].x+rects[0].w+cornerRad/2, y: rects[(i+1)*keyX-1].y, w: rects[(i+1)*keyX-1].w, h: rects[(i+1)*keyX-1].h};
-            cirs2[i] = {x: cirs[i].x+rects[0].w/2, y:cirs[i].y+rects[0].h/2, w:(cirs[i].w-cornerRad/2)/2, h:(cirs[i].w-cornerRad/2)/2};
+        
+        if(ctx) {
+            for(var i = 0 ; i < rects.length; i++) {
+                ctx.strokeStyle=strokeColor;
+                ctx.fillStyle=baseColor;
+                ctx.strokeRect(rects[i].x+cornerRad/2, rects[i].y+cornerRad/2, rects[i].w-cornerRad, rects[i].h-cornerRad);
+                ctx.fillRect(rects[i].x+cornerRad/2, rects[i].y+cornerRad/2, rects[i].w-cornerRad, rects[i].h-cornerRad);
+                ctx.shadowBlur=0;
+                ctx.shadowColor="transparent";
+            }
+            for(var i = 0 ; i < chain ; i++) {
+                cirs[i] = {x: rects[(i+1)*keyX-1].x+rects[0].w+cornerRad/2, y: rects[(i+1)*keyX-1].y, w: rects[(i+1)*keyX-1].w, h: rects[(i+1)*keyX-1].h};
+                ctx.beginPath();
+                ctx.arc(rects[(i+1)*keyX-1].x+cornerRad*(keyY+2), rects[(i+1)*keyX-1].y+cornerRad*(Math.PI), rects[(i+1)*keyX-1].w/2.5, 0, 2*Math.PI, false);
+                if(nowPage == i)
+                    ctx.fillStyle = 'rgba(0,255,255,0.75)';
+                else
+                    ctx.fillStyle = 'white';
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth=cornerRad/(keyY*0.5);
+                ctx.fill();
+                ctx.stroke();
+            }
         }
-
-        for(var i = 0; i < rects.length; i++) {
-            var drect = new createjs.Shape();
-            drect.graphics.setStrokeStyle(cornerRad*4/5, "round", "round", cornerRad);
-            drect.graphics.beginStroke(strokeColor);
-            drect.graphics.beginFill(baseColor);
-            drect.graphics.drawRect(rects[i].x+cornerRad/2, rects[i].y+cornerRad/2, rects[i].w-cornerRad, rects[i].h-cornerRad);
-            stage.addChild(drect);
-        }
-        for(var i = 0 ; i < chain; i++) {
-            var dcir = new createjs.Shape();
-            dcir.graphics.setStrokeStyle(cornerRad/2);
-            dcir.graphics.beginStroke(strokeColor);
-            if(nowPage == i)
-                dcir.graphics.beginFill('rgba(0,255,255,0.75)');
-            else
-                dcir.graphics.beginFill(baseColor);
-            dcir.graphics.drawCircle(cirs[i].x+rects[0].w/2, cirs[i].y+rects[0].h/2, (cirs[i].w-cornerRad/2)/2);
-            stage.addChild(dcir);
-        }
-        stage.update();
     }
+
+    // When Use EaselJS
+    // if(canvas && stage){
+    //     stage.removeAllChildren();
+    //     stage.clear();
+
+    //     var siz = canvas.width > canvas.height ? canvas.height : canvas.width;
+    //     var cornerRad = siz/(keyX*keyY);
+
+    //     bg = new createjs.Shape();
+    //     bg.graphics.beginFill("#444444");
+    //     bg.graphics.drawRoundRect(cornerRad/2, cornerRad/2, canvas.width-cornerRad, canvas.height-cornerRad, cornerRad);
+    //     stage.addChild(bg);
+
+    //     for(var i = 0 ; i < (keyX*keyY); i++){
+    //         rects[i] = {x: (canvas.width/2-(keyX/2)*siz/(keyX+1))+siz*(i%keyX)/(keyX+2), y: (canvas.height/2-(keyY/2)*siz/(keyY+2))+siz*parseInt(i/keyY)/(keyY+2), w: siz/(keyX+3), h: siz/(keyY+3)};
+    //     }
+
+    //     for(var i = 0 ; i < chain; i++){
+    //         cirs[i] = {x: rects[(i+1)*keyX-1].x+rects[0].w+cornerRad/2, y: rects[(i+1)*keyX-1].y, w: rects[(i+1)*keyX-1].w, h: rects[(i+1)*keyX-1].h};
+    //         cirs2[i] = {x: cirs[i].x+rects[0].w/2, y:cirs[i].y+rects[0].h/2, w:(cirs[i].w-cornerRad/2)/2, h:(cirs[i].w-cornerRad/2)/2};
+    //     }
+
+    //     for(var i = 0; i < rects.length; i++) {
+    //         var drect = new createjs.Shape();
+    //         drect.graphics.setStrokeStyle(cornerRad*4/5, "round", "round", cornerRad);
+    //         drect.graphics.beginStroke(strokeColor);
+    //         drect.graphics.beginFill(baseColor);
+    //         drect.graphics.drawRect(rects[i].x+cornerRad/2, rects[i].y+cornerRad/2, rects[i].w-cornerRad, rects[i].h-cornerRad);
+    //         stage.addChild(drect);
+    //     }
+    //     for(var i = 0 ; i < chain; i++) {
+    //         var dcir = new createjs.Shape();
+    //         dcir.graphics.setStrokeStyle(cornerRad/2);
+    //         dcir.graphics.beginStroke(strokeColor);
+    //         if(nowPage == i)
+    //             dcir.graphics.beginFill('rgba(0,255,255,0.75)');
+    //         else
+    //             dcir.graphics.beginFill(baseColor);
+    //         dcir.graphics.drawCircle(cirs[i].x+rects[0].w/2, cirs[i].y+rects[0].h/2, (cirs[i].w-cornerRad/2)/2);
+    //         stage.addChild(dcir);
+    //     }
+
+    //     for(var i = 0 ; i < rects.length; i++){
+    //         stage.removeChild(anim[i]);
+    //         if(pressedKey[nowPage][i]>0) {
+    //             anim[i] = new createjs.Shape();
+    //             // anim[key].graphics.setStrokeStyle(cornerRad/1.75, "round", "round", cornerRad);
+    //             // anim[key].graphics.beginStroke(coloredKey[nowPage][key]);
+    //             // anim[key].graphics.beginFill("transparent");
+    //             // anim[key].graphics.drawRect(rects[key].x+cornerRad, rects[key].y+cornerRad, rects[key].w-cornerRad*2, rects[key].h-cornerRad*2);
+    //             anim[i].graphics.setStrokeStyle(cornerRad/1.75, "round", "round", cornerRad).beginStroke(coloredKey[nowPage][i]).beginFill("transparent").drawRect(rects[i].x+cornerRad, rects[i].y+cornerRad, rects[i].w-cornerRad*2, rects[i].h-cornerRad*2);
+    //             anim[i].shadow = new createjs.Shadow(coloredKey[nowPage][i], 0, 0, cornerRad);
+    //             stage.addChild(anim[i]);
+    //         }
+    //     }
+    //     stage.update();
+    // }
 }
 
-function animate(){
+function animate(key){
     var siz = canvas.width > canvas.height ? canvas.height : canvas.width;
     var cornerRad = siz/(keyX*keyY);
+    ctx.shadowBlur=0;
+    ctx.shadowColor="transparent";
 
-    for(var i = 0 ; i < rects.length; i++){
-        stage.removeChild(anim[i]);
-        if(pressedKey[nowPage][i]>0) {
-            anim[i] = new createjs.Shape();
-            // anim[key].graphics.setStrokeStyle(cornerRad/1.75, "round", "round", cornerRad);
-            // anim[key].graphics.beginStroke(coloredKey[nowPage][key]);
-            // anim[key].graphics.beginFill("transparent");
-            // anim[key].graphics.drawRect(rects[key].x+cornerRad, rects[key].y+cornerRad, rects[key].w-cornerRad*2, rects[key].h-cornerRad*2);
-            // Below code same as above 4 line, but performance is much much better
-            anim[i].graphics.setStrokeStyle(cornerRad/2, "round", "round", cornerRad).beginStroke(coloredKey[nowPage][i]).beginFill("transparent").drawRect(rects[i].x+cornerRad, rects[i].y+cornerRad, rects[i].w-cornerRad*2, rects[i].h-cornerRad*2);
-            anim[i].shadow = new createjs.Shadow(coloredKey[nowPage][i], 0, 0, cornerRad*2);
-            stage.addChild(anim[i]);
+    if(key < rects.length) {
+        ctx.clearRect(rects[key].x+cornerRad/2, rects[key].y+cornerRad/2, rects[key].w-cornerRad, rects[key].h-cornerRad);
+        ctx.fillStyle="#444444";
+        ctx.lineJoin = "round";
+        ctx.lineWidth = cornerRad/(keyY*0.15);
+        ctx.fillRect(rects[key].x, rects[key].y, rects[key].w, rects[key].h);
+
+        ctx.strokeStyle=strokeColor;
+        ctx.fillStyle=baseColor;
+        ctx.strokeRect(rects[key].x+cornerRad/2, rects[key].y+cornerRad/2, rects[key].w-cornerRad, rects[key].h-cornerRad);
+        ctx.fillRect(rects[key].x+cornerRad/2, rects[key].y+cornerRad/2, rects[key].w-cornerRad, rects[key].h-cornerRad);
+        if(pressedKey[nowPage][key]>0)
+        {
+            ctx.lineJoin="round";
+            ctx.lineWidth = cornerRad/(keyY*0.25);
+            ctx.strokeStyle=coloredKey[nowPage][key];
+            ctx.shadowBlur=cornerRad;
+            ctx.shadowColor=coloredKey[nowPage][key];//"rgba(0,0,0,0.66)";
+            ctx.strokeRect(rects[key].x+cornerRad, rects[key].y+cornerRad, rects[key].w-cornerRad*2, rects[key].h-cornerRad*2)
         }
     }
-    stage.update();
+
+
+    // when use EaselJS
+    // var siz = canvas.width > canvas.height ? canvas.height : canvas.width;
+    // var cornerRad = siz/(keyX*keyY);
+    
+    // stage.removeChild(anim[key]);
+    // if(pressedKey[nowPage][key]>0) {
+    //     anim[key] = new createjs.Shape();
+    //     // anim[key].graphics.setStrokeStyle(cornerRad/1.75, "round", "round", cornerRad);
+    //     // anim[key].graphics.beginStroke(coloredKey[nowPage][key]);
+    //     // anim[key].graphics.beginFill("transparent");
+    //     // anim[key].graphics.drawRect(rects[key].x+cornerRad, rects[key].y+cornerRad, rects[key].w-cornerRad*2, rects[key].h-cornerRad*2);
+    //     anim[key].graphics.setStrokeStyle(cornerRad/1.75, "round", "round", cornerRad).beginStroke(coloredKey[nowPage][key]).beginFill("transparent").drawRect(rects[key].x+cornerRad, rects[key].y+cornerRad, rects[key].w-cornerRad*2, rects[key].h-cornerRad*2);
+    //     anim[key].shadow = new createjs.Shadow(coloredKey[nowPage][key], 0, 0, cornerRad);
+    //     stage.addChild(anim[key]);
+    // }
+    // stage.update();
 }
 
 function Touched(ev){
@@ -303,6 +403,8 @@ function LoadingStatus(){
 }
 
 function setProject() {
+    // createjs.Ticker.on("tick", render);
+    // createjs.Ticker.framerate = 60;
     stopT();
     projectName = songs[select.selectedIndex];
     nowPage = 0;
@@ -324,9 +426,38 @@ function setProject() {
             if(str[0] == "buttonY")
                 keyY = parseInt(str[1]);
         }
-        arrinit();
+
+        sound.length = 0;
+        audio.length = 0;
+        pressedKey.length = 0;
+        coloredKey.length = 0;
+        keyCount.length = 0;
+        counter.length = 0;
+        keyTest.length=0;
+        audioInstance.length=0;
+        for(var j = 0 ; j < chain; j++)
+        {
+            sound[j] = [];
+            audio[j] = [];
+            pressedKey[j] = [];
+            coloredKey[j] = [];
+            keyCount[j] = [];
+            counter[j] = [];
+            keyTest[j] = [];
+            for(var i = 0 ; i < keyX*keyY; i++)
+            {
+                sound[j][i] = [];
+                audio[j][i] = [];
+                pressedKey[j][i] = 0
+                coloredKey[j][i] = "#FF0000";
+                keyCount[j][i] = 0;
+                counter[j][i] = 0;
+                keyTest[j][i] = [];
+            }
+        }
         document.getElementById("Info").innerText="Info:Loaded";
 
+        ctx.clearRect(0,0,canvas.width,canvas.height);
         initBtnEL();
 
         getData(projectName+'/keySound', function(result){
@@ -341,7 +472,7 @@ function setProject() {
                     sound[page][num].push(projectName+'/sounds/'+str[3]);
                     audio[page][num][keyCount[page][num]] = str[3];
                     createjs.Sound.registerSound(sound[page][num][keyCount[page][num]], audio[page][num][keyCount[page][num]], 1);
-                    keyCount[page][num]++;
+                     keyCount[page][num]++;
                 }
                 else continue;
             }
@@ -411,9 +542,16 @@ function getData(fName, callback) {
 }
 
 function auto() {
+    console.log(keyTest);
     stopT();
     autoP = true;
     autoProcess(0);
+}
+
+function initz() {
+    pressedKey[nowPage].fill(0);
+    coloredKey[nowPage].fill(strokeColor);
+    render();
 }
 
 function autoProcess(tt) {
@@ -421,24 +559,22 @@ function autoProcess(tt) {
     if(tt < autoData.length && autoData.length > 0 && autoP)
     {
         var temp = autoData[tt].split(' ');
-        var tCase = temp[0].toLowerCase();
-        if(tCase == 'c' || tCase == "chain")
+        if(temp[0] == 'c' || temp[0] == "chain")
         {
             nowPage = parseInt(temp[1])-1;
             render();
-            // If want initialize button colors when page changed
             //initz();
         }
-        else if(tCase == 'd' || tCase == 'delay')
+        else if(temp[0] == 'd' || temp[0] == 'delay')
             dur += parseInt(temp[1]);
-        else if(tCase == 'o')
+        else if(temp[0] == 'o')
         {
             var keyNum = (parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1);
             if(keyTest[nowPage][keyNum].length > 0)
                 keyLED1(keyNum, counter[nowPage][keyNum], 0);
             playAudio(nowPage, keyNum);
         }
-        else if(tCase == 'f')
+        else if(temp[0] == 'f')
 
         dur--;
         if(dur < 0)
@@ -450,8 +586,12 @@ function autoProcess(tt) {
     }
 }
 
-function onLED(page, key) {
+function onLED(page, key)
+{
     pressedKey[page][key] = 1;
+    requestAnimationFrame(function(){
+        animate(key);
+    });
 }
 
 function onLED2(page, key, color)
@@ -461,10 +601,17 @@ function onLED2(page, key, color)
         coloredKey[page][key] = keyColor[parseInt(color)];
     else
         coloredKey[page][key] = s2c(color);
+    requestAnimationFrame(function(){
+        animate(key);
+    });
 }
 
-function offLED(page, key) {
+function offLED(page, key)
+{
     pressedKey[page][key] = 0;
+    requestAnimationFrame(function(){
+        animate(key);
+    });
 }
 
 function keyLED1(key, cnt, tt) {
@@ -479,17 +626,16 @@ function keyLED1(key, cnt, tt) {
     if(tt < keyTest[nowPage][key][cnt].length)
     {
         var str = temp.split(' ');
-        var sCase = str[0].toLowerCase();
 
         if(str.length > 0) {
-            if(sCase == 'd' || sCase == 'delay')
+            if(str[0] == 'd' || str[0] == 'delay')
                 dur += parseInt(str[1]);
-            else if(sCase == 'o' || sCase == 'on')
-                if(str[3].toLowerCase() == 'a' || str[3].toLowerCase() == 'auto')
+            else if(str[0] == 'o' || str[0] == 'on')
+                if(str[3] == 'a' || str[3] == 'auto')
                     onLED2(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1), str[4]);
                 else
                     onLED2(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1), str[3]);
-            else if(sCase == 'f' || sCase == 'off')
+            else if(str[0] == 'f' || str[0] == 'off')
                 offLED(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1));
         }
 
@@ -509,9 +655,8 @@ function keyLED2(key, tt) {
     if(tt < keyTest[nowPage][key][counter[nowPage][key]].length && temp.length > 0)
     {
         var str = temp.split(' ');
-        var sCase = str[0].toLowerCase();
         if(str.length > 0)
-            if(sCase == 'o' || sCase == 'f' || sCase == 'on' || sCase == 'off')
+            if(str[0] == 'o' || str[0] == 'f' || str[0] == 'on' || str[0] == 'off')
                 offLED(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1));
 
         keyLED2(key, tt+1);
@@ -535,43 +680,4 @@ function s2c(str) {
         colour += ('00' + value.toString(16)).substr(-2);
     }
     return colour;
-}
-
-// init all arrays
-function arrinit() {
-    sound.length = 0;
-    audio.length = 0;
-    pressedKey.length = 0;
-    coloredKey.length = 0;
-    keyCount.length = 0;
-    counter.length = 0;
-    keyTest.length=0;
-    audioInstance.length=0;
-    anim.length=0;
-    for(var j = 0 ; j < chain; j++)
-    {
-        sound[j] = [];
-        audio[j] = [];
-        pressedKey[j] = [];
-        coloredKey[j] = [];
-        keyCount[j] = [];
-        counter[j] = [];
-        keyTest[j] = [];
-        for(var i = 0 ; i < keyX*keyY; i++)
-        {
-            sound[j][i] = [];
-            audio[j][i] = [];
-            pressedKey[j][i] = 0
-            coloredKey[j][i] = "#FF0000";
-            keyCount[j][i] = 0;
-            counter[j][i] = 0;
-            keyTest[j][i] = [];
-        }
-    }
-}
-
-function initz() {
-    pressedKey[nowPage].fill(0);
-    coloredKey[nowPage].fill(strokeColor);
-    render();
 }
