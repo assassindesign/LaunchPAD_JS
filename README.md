@@ -29,4 +29,4 @@ LaunchPAD on JavaScript
 	CreateJS-SoundJS : https://github.com/CreateJS
 	
 # Support Browser, Env
-	Except IE, any other browsers support
+	Except IE, any other browsers are supported
