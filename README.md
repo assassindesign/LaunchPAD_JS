@@ -27,3 +27,6 @@ LaunchPAD on JavaScript
 # Used API
 
 	CreateJS-SoundJS : https://github.com/CreateJS
+	
+# Support Browser, Env
+	Except IE, any other browsers support
