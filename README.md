@@ -22,7 +22,7 @@ LaunchPAD on JavaScript
 
 # Video
 	Version1.1 Click▼
-[![LPSJ](https://github.com/rouismia/LaunchPAD_JS/blob/V_1.1/img/V1.1/The%20Spectre.gif?raw=true)](https://www.youtube.com/watch?v=VlBlGmsLa2A&feature=youtu.be "LPSJ")
+[![LPSJ](https://github.com/rouismia/LaunchPAD_JS/blob/V_1.1/img/V1.1/The%20Spectre.gif?raw=true)](https://youtu.be/d9dTKQ1jc1Y "LPSJ")
 
 # Used API
 
