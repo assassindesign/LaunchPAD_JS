@@ -4,7 +4,7 @@ var keyList = [65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86
     96,97,98,99,100,101,102,103,104,105,
     111,106,109,107,110,
     189,187,8,219,221,220,186,222,188,190,191,192,16];
-var url = 'http://127.0.0.1:9000';
+var url = 'http://rmrouis.iptime.org:9000';
 var mobile = false;
 var velocity;
 var opacity = ",1)";
@@ -487,7 +487,6 @@ function setProject() {
                 (function(p){
                     var tmp = LEDList[p].split(' ');
                     getData(projectName+"/keyLED/"+LEDList[p], function(result){
-    
                         var pNum = parseInt(tmp[0])-1;
                         var keyNum = (parseInt(tmp[1])-1)*keyX+(parseInt(tmp[2])-1);
                         keyTest[pNum][keyNum].push(result.msg);
