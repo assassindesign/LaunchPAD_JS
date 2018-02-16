@@ -385,10 +385,6 @@ function setProject() {
     nowPage = 0;
     LoadingStatus();    // set all message to loading
 
-    rects.length = 0;
-    cirs.length = 0;
-    cirs2.length = 0;
-
     //get all data
     getData(projectName+'/info', function(result){
         info = result.msg;
@@ -458,8 +454,7 @@ function setProject() {
         getData(projectName+'/autoPlay', function(result){
             autoData = result.msg;
             document.getElementById("AutoData").innerText="AutoData:Loaded";
-        }); 
-        stopT();
+        });
     });
 }
 
@@ -661,6 +656,9 @@ function arrinit() {
     anim.length=0;
     drect.length=0;
     dcir.length=0;
+    rects.length = 0;
+    cirs.length = 0;
+    cirs2.length = 0;
     for(var j = 0 ; j < chain; j++)
     {
         sound[j] = [];
