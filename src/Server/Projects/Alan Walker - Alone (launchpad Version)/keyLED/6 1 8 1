@@ -1,0 +1,31 @@
+
+on 1 8 a 124
+d 30
+on 1 7 a 124
+on 2 8 a 124
+d 30
+on 1 6 a 124
+on 2 7 a 124
+on 3 8 a 124
+off 1 8
+d 30
+on 1 5 a 124
+on 2 6 a 124
+on 3 7 a 124
+on 4 8 a 124
+off 1 7
+off 2 8
+d 30
+on 1 4 a 124
+on 2 5 a 124
+on 3 6 a 124
+on 4 7 a 124
+on 5 8 a 124
+off 1 6
+off 2 7
+off 3 8
+d 30
+off 1 5
+off 2 6
+off 3 7
+off 4 8

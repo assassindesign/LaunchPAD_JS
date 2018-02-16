@@ -1,0 +1,121 @@
+
+o 1 1 auto 3
+o 8 1 auto 3
+o 8 8 auto 3
+o 1 8 auto 3
+d 15
+o 1 2 auto 3
+o 8 2 auto 3
+o 8 7 auto 3
+o 1 7 auto 3
+d 15
+o 2 3 auto 3
+o 7 3 auto 3
+o 7 6 auto 3
+o 2 6 auto 3
+o 1 1 auto 2
+o 8 1 auto 2
+o 8 8 auto 2
+o 1 8 auto 2
+d 15
+o 3 3 auto 3
+o 3 6 auto 3
+o 6 3 auto 3
+o 6 6 auto 3
+o 1 2 auto 2
+o 8 2 auto 2
+o 8 7 auto 2
+o 1 7 auto 2
+o 1 1 auto 1
+o 8 1 auto 1
+o 8 8 auto 1
+o 1 8 auto 1
+d 15
+o 4 3 auto 3
+o 5 3 auto 3
+o 4 6 auto 3
+o 5 6 auto 3
+o 2 3 auto 2
+o 7 3 auto 2
+o 7 6 auto 2
+o 2 6 auto 2
+o 1 2 auto 1
+o 8 2 auto 1
+o 1 7 auto 1
+o 8 7 auto 1
+f 1 1
+f 8 1
+f 8 8
+f 1 8
+d 15
+o 4 2 auto 3
+o 5 2 auto 3
+o 5 7 auto 3
+o 4 7 auto 3
+o 4 4 auto 3
+o 4 5 auto 3
+o 5 4 auto 3
+o 5 5 auto 3
+o 3 3 auto 2
+o 3 6 auto 2
+o 6 3 auto 2
+o 6 6 auto 2
+o 2 3 auto 1
+o 7 3 auto 1
+o 7 6 auto 1
+o 2 6 auto 1
+f 1 2
+f 8 2
+f 8 7
+f 1 7
+d 15
+o 4 2 auto 2
+o 5 2 auto 2
+o 4 3 auto 2
+o 5 3 auto 2
+o 4 4 auto 2
+o 5 4 auto 2
+o 4 5 auto 2
+o 5 5 auto 2
+o 4 6 auto 2
+o 5 6 auto 2
+o 4 7 auto 2
+o 5 7 auto 2
+o 3 3 auto 1
+o 6 3 auto 1
+o 6 6 auto 1
+o 3 6 auto 1
+f 2 3
+f 7 3
+f 7 6
+f 2 6
+d 15
+o 4 2 auto 1
+o 5 2 auto 1
+o 4 3 auto 1
+o 5 3 auto 1
+o 4 4 auto 1
+o 5 4 auto 1
+o 4 5 auto 1
+o 5 5 auto 1
+o 4 6 auto 1
+o 5 6 auto 1
+o 4 7 auto 1
+o 5 7 auto 1
+f 3 3
+f 3 6
+f 6 3
+f 6 6
+d 15
+f 4 2
+f 5 2
+f 5 3
+f 4 3
+f 5 4
+f 4 4
+f 5 5
+f 4 5
+f 5 6
+f 4 6
+f 5 7
+f 4 7

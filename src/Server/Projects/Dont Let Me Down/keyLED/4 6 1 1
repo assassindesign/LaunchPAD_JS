@@ -1,0 +1,23 @@
+on 6 1 auto 3
+d 50
+on 6 2 auto 3
+on 7 1 auto 3
+on 4 1 auto 3
+delay 50
+
+on 6 3 auto 3
+on 4 1 auto 3
+on 8 1 auto 3
+
+d 50
+
+on 6 1 auto 0
+d 50
+on 6 2 auto 0
+on 7 1 auto 0
+on 4 1 auto 0
+delay 50
+
+on 6 3 auto 0
+on 4 1 auto 0
+on 8 1 auto 0

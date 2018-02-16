@@ -1,0 +1,349 @@
+on 2 2 auto 41
+on 9 2 auto 41
+on 9 9 auto 41
+on 2 9 auto 41
+delay 20
+on 8 9 auto 41
+on 9 8 auto 41
+on 2 8 auto 41
+on 3 9 auto 41
+on 3 2 auto 41
+on 2 3 auto 41
+on 9 3 auto 41
+on 8 2 auto 41
+on 9 9 auto 49
+on 9 2 auto 49
+on 2 9 auto 49
+on 2 2 auto 49
+delay 20
+on 9 4 auto 41
+on 8 3 auto 41
+on 7 9 auto 41
+on 8 8 auto 41
+on 2 7 auto 41
+on 3 8 auto 41
+on 4 2 auto 41
+on 3 3 auto 41
+on 9 3 auto 49
+on 8 2 auto 49
+on 8 9 auto 49
+on 9 8 auto 49
+on 2 8 auto 49
+on 3 9 auto 49
+on 2 3 auto 49
+on 3 2 auto 49
+on 9 9 auto 53
+on 2 9 auto 53
+on 9 2 auto 53
+on 2 2 auto 53
+delay 20
+on 6 9 auto 41
+on 7 8 auto 41
+on 9 5 auto 41
+on 8 4 auto 41
+on 2 6 auto 41
+on 3 7 auto 41
+on 5 2 auto 41
+on 4 3 auto 41
+on 7 9 auto 49
+on 8 8 auto 49
+on 2 7 auto 49
+on 3 8 auto 49
+on 9 4 auto 49
+on 8 3 auto 49
+on 4 2 auto 49
+on 3 3 auto 49
+on 9 8 auto 53
+on 8 9 auto 53
+on 2 8 auto 53
+on 3 9 auto 53
+on 9 3 auto 53
+on 8 2 auto 53
+on 3 2 auto 53
+on 2 3 auto 53
+on 9 9 auto 57
+on 2 9 auto 57
+on 2 2 auto 57
+on 9 2 auto 57
+delay 20
+on 5 9 auto 41
+on 6 8 auto 41
+on 8 5 auto 41
+on 9 6 auto 41
+on 2 5 auto 41
+on 3 6 auto 41
+on 6 2 auto 41
+on 5 3 auto 41
+on 7 8 auto 49
+on 6 9 auto 49
+on 9 5 auto 49
+on 8 4 auto 49
+on 3 7 auto 49
+on 2 6 auto 49
+on 5 2 auto 49
+on 4 3 auto 49
+on 9 4 auto 53
+on 8 3 auto 53
+on 8 8 auto 53
+on 7 9 auto 53
+on 3 8 auto 53
+on 2 7 auto 53
+on 3 3 auto 53
+on 4 2 auto 53
+on 9 8 auto 57
+on 8 9 auto 57
+on 3 9 auto 57
+on 2 8 auto 57
+on 3 2 auto 57
+on 2 3 auto 57
+on 9 3 auto 57
+on 8 2 auto 57
+on 9 9 auto 58
+on 2 9 auto 58
+on 2 2 auto 58
+on 9 2 auto 58
+delay 20
+on 6 3 auto 41
+on 8 6 auto 41
+on 5 8 auto 41
+on 3 5 auto 41
+on 9 6 auto 49
+on 8 5 auto 49
+on 6 8 auto 49
+on 5 9 auto 49
+on 3 6 auto 49
+on 2 5 auto 49
+on 6 2 auto 49
+on 5 3 auto 49
+on 7 8 auto 53
+on 6 9 auto 53
+on 2 6 auto 53
+on 3 7 auto 53
+on 4 3 auto 53
+on 5 2 auto 53
+on 9 5 auto 53
+on 8 4 auto 53
+on 8 8 auto 57
+on 7 9 auto 57
+on 3 8 auto 57
+on 2 7 auto 57
+on 3 3 auto 57
+on 4 2 auto 57
+on 9 4 auto 57
+on 8 3 auto 57
+on 9 8 auto 58
+on 8 9 auto 58
+on 2 8 auto 58
+on 3 9 auto 58
+on 2 3 auto 58
+on 3 2 auto 58
+on 9 3 auto 58
+on 8 2 auto 58
+on 9 9 auto 59
+on 2 9 auto 59
+on 2 2 auto 59
+on 9 2 auto 59
+delay 20
+on 5 7 auto 41
+on 4 5 auto 41
+on 6 4 auto 41
+on 7 6 auto 41
+on 5 8 auto 49
+on 3 5 auto 49
+on 6 3 auto 49
+on 8 6 auto 49
+on 6 8 auto 53
+on 5 9 auto 53
+on 3 6 auto 53
+on 2 5 auto 53
+on 9 6 auto 53
+on 8 5 auto 53
+on 5 3 auto 53
+on 6 2 auto 53
+on 7 8 auto 57
+on 6 9 auto 57
+on 3 7 auto 57
+on 2 6 auto 57
+on 4 3 auto 57
+on 5 2 auto 57
+on 9 5 auto 57
+on 8 4 auto 57
+on 8 8 auto 58
+on 7 9 auto 58
+on 3 8 auto 58
+on 2 7 auto 58
+on 3 3 auto 58
+on 4 2 auto 58
+on 9 4 auto 58
+on 8 3 auto 58
+on 9 8 auto 59
+on 8 9 auto 59
+on 3 9 auto 59
+on 2 8 auto 59
+on 2 3 auto 59
+on 3 2 auto 59
+on 9 3 auto 59
+on 8 2 auto 59
+off 9 9
+off 2 9
+off 2 2
+off 9 2
+delay 20
+on 6 5 auto 41
+on 6 6 auto 41
+on 5 6 auto 41
+on 5 5 auto 41
+on 7 6 auto 49
+on 5 7 auto 49
+on 4 5 auto 49
+on 6 4 auto 49
+on 6 3 auto 53
+on 8 6 auto 53
+on 5 8 auto 53
+on 3 5 auto 53
+on 8 5 auto 57
+on 9 6 auto 57
+on 6 8 auto 57
+on 5 9 auto 57
+on 3 6 auto 57
+on 2 5 auto 57
+on 5 3 auto 57
+on 6 2 auto 57
+on 7 8 auto 58
+on 6 9 auto 58
+on 3 7 auto 58
+on 2 6 auto 58
+on 4 3 auto 58
+on 5 2 auto 58
+on 9 5 auto 58
+on 8 4 auto 58
+on 8 8 auto 59
+on 7 9 auto 59
+on 3 8 auto 59
+on 2 7 auto 59
+on 4 2 auto 59
+on 3 3 auto 59
+on 9 4 auto 59
+on 8 3 auto 59
+off 9 8
+off 8 9
+off 3 9
+off 2 8
+off 2 3
+off 3 2
+off 8 2
+off 9 3
+delay 20
+on 6 5 auto 49
+on 6 6 auto 49
+on 5 6 auto 49
+on 5 5 auto 49
+on 7 6 auto 53
+on 5 7 auto 53
+on 4 5 auto 53
+on 6 4 auto 53
+on 8 6 auto 57
+on 5 8 auto 57
+on 3 5 auto 57
+on 6 3 auto 57
+on 9 6 auto 58
+on 8 5 auto 58
+on 6 8 auto 58
+on 5 9 auto 58
+on 3 6 auto 58
+on 2 5 auto 58
+on 5 3 auto 58
+on 6 2 auto 58
+on 7 8 auto 59
+on 6 9 auto 59
+on 3 7 auto 59
+on 2 6 auto 59
+on 9 5 auto 59
+on 8 4 auto 59
+on 5 2 auto 59
+on 4 3 auto 59
+off 8 8
+off 7 9
+off 3 8
+off 2 7
+off 3 3
+off 4 2
+off 8 3
+off 9 4
+delay 20
+on 6 5 auto 53
+on 6 6 auto 53
+on 5 6 auto 53
+on 5 5 auto 53
+on 7 6 auto 57
+on 5 7 auto 57
+on 4 5 auto 57
+on 6 4 auto 57
+on 8 6 auto 58
+on 5 8 auto 58
+on 3 5 auto 58
+on 6 3 auto 58
+on 9 6 auto 59
+on 8 5 auto 59
+on 6 8 auto 59
+on 5 9 auto 59
+on 3 6 auto 59
+on 2 5 auto 59
+on 6 2 auto 59
+on 5 3 auto 59
+off 9 5
+off 8 4
+off 7 8
+off 6 9
+off 3 7
+off 2 6
+off 4 3
+off 5 2
+delay 20
+on 5 5 auto 57
+on 6 5 auto 57
+on 6 6 auto 57
+on 5 6 auto 57
+on 7 6 auto 58
+on 5 7 auto 58
+on 4 5 auto 58
+on 6 4 auto 58
+on 8 6 auto 59
+on 5 8 auto 59
+on 3 5 auto 59
+on 6 3 auto 59
+off 6 8
+off 5 9
+off 3 6
+off 2 5
+off 8 5
+off 9 6
+off 6 2
+off 5 3
+delay 20
+on 6 5 auto 58
+on 6 6 auto 58
+on 5 6 auto 58
+on 5 5 auto 58
+on 7 6 auto 59
+on 5 7 auto 59
+on 4 5 auto 59
+on 6 4 auto 59
+off 5 8
+off 3 5
+off 6 3
+off 8 6
+delay 20
+on 5 5 auto 59
+on 5 6 auto 59
+on 6 5 auto 59
+on 6 6 auto 59
+off 5 7
+off 4 5
+off 6 4
+off 7 6
+delay 20
+off 5 5
+off 6 6
+off 5 6
+off 6 5

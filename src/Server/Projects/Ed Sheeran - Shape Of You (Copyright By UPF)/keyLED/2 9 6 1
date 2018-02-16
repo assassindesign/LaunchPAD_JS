@@ -1,0 +1,15 @@
+on 9 6 auto 39
+delay 20
+on 9 6 auto 38
+delay 30
+on 9 6 auto 37
+delay 40
+on 9 6 auto 13
+delay 40
+on 9 6 auto 53
+delay 40
+on 9 6 auto 54
+delay 30
+on 9 6 auto 55
+delay 10
+off 9 6

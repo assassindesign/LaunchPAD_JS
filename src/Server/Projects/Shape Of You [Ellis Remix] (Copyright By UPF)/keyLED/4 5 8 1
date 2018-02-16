@@ -1,0 +1,32 @@
+
+o 5 3 auto 13
+o 6 3 auto 13
+o 7 3 auto 13
+o 8 3 auto 13
+d 30
+o 5 2 auto 14
+o 6 2 auto 14
+o 7 4 auto 14
+d 30
+o 6 2 auto 13
+o 5 2 auto 13
+o 7 4 auto 13
+f 5 3
+f 6 3
+f 8 3
+d 30
+o 6 1 auto 13
+o 6 3 auto 13
+o 6 4 auto 13
+o 5 2 auto 14
+o 7 3 auto 14
+o 7 4 auto 14
+d 30
+f 5 2
+f 7 3
+f 7 4
+d 300
+f 6 1
+f 6 2
+f 6 3
+f 6 4

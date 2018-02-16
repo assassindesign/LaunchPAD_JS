@@ -1,0 +1,96 @@
+on 1 7 auto 39
+delay 15
+on 2 7 auto 39
+on 1 7 auto 38
+delay 15
+on 3 7 auto 39
+on 2 7 auto 38
+on 1 7 auto 37
+delay 15
+on 4 7 auto 39
+on 3 7 auto 38
+on 2 7 auto 37
+on 1 7 auto 14
+delay 15
+on 5 7 auto 39
+on 4 7 auto 38
+on 3 7 auto 37
+on 2 7 auto 14
+on 1 7 auto 13
+delay 15
+on 6 7 auto 39
+on 5 7 auto 38
+on 4 7 auto 37
+on 3 7 auto 14
+on 2 7 auto 13
+on 1 7 auto 14
+delay 15
+on 7 7 auto 39
+on 6 7 auto 38
+on 5 7 auto 37
+on 4 7 auto 14
+on 3 7 auto 13
+on 2 7 auto 14
+on 1 7 auto 53
+delay 15
+on 8 7 auto 39
+on 7 7 auto 38
+on 6 7 auto 37
+on 5 7 auto 14
+on 4 7 auto 13
+on 3 7 auto 14
+on 2 7 auto 53
+on 1 7 auto 54
+delay 15
+on 8 7 auto 38
+on 7 7 auto 37
+on 6 7 auto 14
+on 5 7 auto 13
+on 4 7 auto 14
+on 3 7 auto 53
+on 2 7 auto 54
+on 1 7 auto 55
+delay 15
+on 8 7 auto 37
+on 7 7 auto 14
+on 6 7 auto 13
+on 5 7 auto 14
+on 4 7 auto 53
+on 3 7 auto 54
+on 2 7 auto 55
+off 1 7
+delay 15
+on 8 7 auto 14
+on 7 7 auto 13
+on 6 7 auto 14
+on 5 7 auto 53
+on 4 7 auto 54
+on 3 7 auto 55
+off 2 7
+delay 15
+on 8 7 auto 13
+on 7 7 auto 14
+on 6 7 auto 53
+on 5 7 auto 54
+on 4 7 auto 55
+off 3 7
+delay 15
+on 8 7 auto 14
+on 7 7 auto 53
+on 6 7 auto 54
+on 5 7 auto 55
+off 4 7
+delay 15
+on 8 7 auto 53
+on 7 7 auto 54
+on 6 7 auto 55
+off 5 7
+delay 15
+on 8 7 auto 54
+on 7 7 auto 55
+off 6 7
+delay 15
+on 8 7 auto 55
+off 7 7
+delay 15
+off 8 7
