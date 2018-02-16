@@ -21,9 +21,11 @@
 	http://rmrouis.iptime.org:20000/audio.html
 
 # Video
-	Version1.1 Click▼
+	Version1.1 The Spectre Click▼
 [![LPSJ](https://github.com/rouismia/LaunchPAD_JS/blob/V_1.1/img/V1.1/The%20Spectre.gif?raw=true)](https://youtu.be/d9dTKQ1jc1Y "LPSJ")
-
+	
+	Version1.1 Shape of You Click▼
+[![LPSJ2](https://github.com/rouismia/LaunchPAD_JS/blob/V_1.1/img/V1.1/Shape%20of%20You.gif?raw=true)](https://youtu.be/d9dTKQ1jc1Y "LPSJ2")
 # Used API
 
 	CreateJS-SoundJS : https://github.com/CreateJS
