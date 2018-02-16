@@ -6,18 +6,17 @@ var keyList = [65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86
     189,187,8,219,221,220,186,222,188,190,191,192,16];
 var url = 'http://127.0.0.1:9000'; //server address
 var mobile = false;                         //mobile status identifier
+var IE = false;
 var velocity;                               //color number
 var opacity = ",1)";                        //opacity postfix
 var select, songs, LEDList;                 //selected song, song list, song's LED list
 var keyColor = [];                          //button velocity
 var pressedKey = [];                        //pressing status idf
 var coloredKey = [];                        //button LED Color
-var oriPressedKey = [];                     
-var oriColoredKey = [];                     //arr for init keys
 var keyCount = [];                          //number of same button's sample
 var counter = [];                           //press counter
 var baseColor = "#FFFFFF";                  //base Color, dark gray
-var strokeColor = "rgba(255,255,255,0.6)";  //outer of button color, light gray
+var strokeColor = "rgba(255,255,255,0.65)";  //outer of button color, light gray
 var sound = [];                             //sample's url
 var audio = [];                             //audio obj
 var audioInstance = [];                     //arr for control audio obj
@@ -26,6 +25,9 @@ var cirs = [];                              //page button position
 var cirs2 = [];                             //page button obj
 var rects = [];                             //button obj
 var anim = [];                              //button LED animation arr
+var drect = [];
+var dcir = [];
+var bg;
 var canvas;                                 
 var nowPage = 0;
 var projectName;                            //Song name
@@ -77,6 +79,20 @@ if (!Array.prototype.fill) {
 // Application initialization
 $(function() {
     var filter = "win16|win32|win64|mac";
+    // Opera 8.0+
+    var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+    // Firefox 1.0+
+    var isFirefox = typeof InstallTrigger !== 'undefined';
+    // Safari 3.0+ "[object HTMLElementConstructor]" 
+    var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+    // Internet Explorer 6-11
+    var isIE = /*@cc_on!@*/false || !!document.documentMode;
+    // Edge 20+
+    var isEdge = !isIE && !!window.StyleMedia;
+    // Chrome 1+
+    var isChrome = !!window.chrome && !!window.chrome.webstore;
+    // Blink engine detection
+    var isBlink = (isChrome || isOpera) && !!window.CSS;
 
     // on mobile env, for support multi touch, identify device status
     if(navigator.platform){
@@ -89,8 +105,16 @@ $(function() {
             //alert("PC");
             mobile = false;
             document.getElementById("Env").innerText = "PC";
-            createjs.Ticker.on("tick", animate);
-            createjs.Ticker.framerate = 48;
+            if(!isIE && !isEdge){
+                IE = false;
+                createjs.Ticker.on("tick", render);
+                createjs.Ticker.framerate = 48;
+            }
+            else{
+                IE = true;
+                if(isIE)
+                    alert("Audio almost not working well on IE...\nplease use other browser T^T\nSorry")
+            }
         }
     }
 
@@ -166,7 +190,7 @@ function collides(x, y) {
             if(audio[nowPage][i][counter[nowPage][i]])
             {
                 if(keyTest[nowPage][i].length > 0)
-                    keyLED1(i, counter[nowPage][i], 0)
+                    keyLED1(nowPage, i, counter[nowPage][i], 0)
                 playAudio(nowPage,i);
             }
             else return null;
@@ -187,7 +211,7 @@ function collides2(x, y) {
             && top <= y) {
             isCollision = cirs[i];
             nowPage = i;
-            initz();
+            render();
         }
     }
     return isCollision;
@@ -205,16 +229,17 @@ window.addEventListener('keyup', function(e) {
 // Launchpad Canvas Renderer
 function render() {
     if(canvas && stage){
-        stage.removeAllChildren();
-        stage.clear();
+        // stage.removeAllChildren();
+        // stage.clear();
 
         var siz = canvas.width > canvas.height ? canvas.height : canvas.width;
         var cornerRad = siz/(keyX*keyY);
 
         // for background
+        stage.removeChild(bg);
         bg = new createjs.Shape();
-        bg.graphics.beginFill("#444444");   // dark gray color
-        bg.graphics.drawRoundRect(cornerRad/2, cornerRad/2, canvas.width-cornerRad, canvas.height-cornerRad, cornerRad);
+        // background:dark gray
+        bg.graphics.beginFill("#444444").drawRoundRect(cornerRad/2, cornerRad/2, canvas.width-cornerRad, canvas.height-cornerRad, cornerRad);
         stage.addChild(bg);
 
         // set buttons offset
@@ -229,23 +254,28 @@ function render() {
 
         // draw all buttons
         for(var i = 0; i < rects.length; i++) {
-            var drect = new createjs.Shape();
-            drect.graphics.setStrokeStyle(cornerRad*4/5, "round", "round", cornerRad);
-            drect.graphics.beginStroke(strokeColor);
-            drect.graphics.beginFill(baseColor);
-            drect.graphics.drawRect(rects[i].x+cornerRad/2, rects[i].y+cornerRad/2, rects[i].w-cornerRad, rects[i].h-cornerRad);
-            stage.addChild(drect);
+            stage.removeChild(drect[i]);
+            drect[i] = new createjs.Shape();
+            if(pressedKey[i]>0){
+                drect[i].graphics.setStrokeStyle(cornerRad/2, "round", "round", cornerRad).beginStroke(coloredKey[i]).beginFill(baseColor).drawRect(rects[i].x+cornerRad/3, rects[i].y+cornerRad/3, rects[i].w-cornerRad*2/3, rects[i].h-cornerRad*2/3);
+                if(!mobile && !IE)
+                    drect[i].shadow = new createjs.Shadow(coloredKey[i], 0, 0, cornerRad*2);
+            } else
+                drect[i].graphics.setStrokeStyle(cornerRad*4/5, "round", "round", cornerRad).beginStroke(strokeColor).beginFill(baseColor).drawRect(rects[i].x+cornerRad/2, rects[i].y+cornerRad/2, rects[i].w-cornerRad, rects[i].h-cornerRad);
+            stage.addChild(drect[i]);
         }
         for(var i = 0 ; i < chain; i++) {
-            var dcir = new createjs.Shape();
-            dcir.graphics.setStrokeStyle(cornerRad/2);
-            dcir.graphics.beginStroke(strokeColor);
-            if(nowPage == i)
-                dcir.graphics.beginFill('rgba(0,255,255,0.75)');
+            stage.removeChild(dcir[i]);
+            dcir[i] = new createjs.Shape();
+            dcir[i].graphics.setStrokeStyle(cornerRad/2);
+            if(nowPage == i){
+                dcir[i].graphics.beginStroke('rgba(50,200,200,0.65)');
+                dcir[i].shadow = new createjs.Shadow('rgba(50,200,200,0.65)',0,0,cornerRad*2);
+            }
             else
-                dcir.graphics.beginFill(baseColor);
-            dcir.graphics.drawCircle(cirs[i].x+rects[0].w/2, cirs[i].y+rects[0].h/2, (cirs[i].w-cornerRad/2)/2);
-            stage.addChild(dcir);
+                dcir[i].graphics.beginStroke(strokeColor);
+            dcir[i].graphics.beginFill(baseColor).drawCircle(cirs[i].x+rects[0].w/2, cirs[i].y+rects[0].h/2, (cirs[i].w-cornerRad/2)/2);
+            stage.addChild(dcir[i]);
         }
         stage.update();
     }
@@ -259,19 +289,14 @@ function animate(){
     //pressed buttons outter get glow
     for(var i = 0 ; i < rects.length; i++){
         stage.removeChild(anim[i]);
-        if(pressedKey[nowPage][i]>0) {
+        if(pressedKey[i]>0) {
             anim[i] = new createjs.Shape();
-            // anim[key].graphics.setStrokeStyle(cornerRad/1.75, "round", "round", cornerRad);
-            // anim[key].graphics.beginStroke(coloredKey[nowPage][key]);
-            // anim[key].graphics.beginFill("transparent");
-            // anim[key].graphics.drawRect(rects[key].x+cornerRad, rects[key].y+cornerRad, rects[key].w-cornerRad*2, rects[key].h-cornerRad*2);
-                // Below code same as above 4 line, but performance is much much better
-                // Inner Glow Version
+            // Inner Glow Version
             // anim[i].graphics.setStrokeStyle(cornerRad/2, "round", "round", cornerRad).beginStroke(coloredKey[nowPage][i]).beginFill("transparent").drawRect(rects[i].x+cornerRad, rects[i].y+cornerRad, rects[i].w-cornerRad*2, rects[i].h-cornerRad*2);
             // anim[i].shadow = new createjs.Shadow(coloredKey[nowPage][i], 0, 0, cornerRad*2);
-                // Outer Glow Version
-            anim[i].graphics.setStrokeStyle(cornerRad/2, "round", "round", cornerRad).beginStroke(coloredKey[nowPage][i]).beginFill("transparent").drawRect(rects[i].x+cornerRad/3, rects[i].y+cornerRad/3, rects[i].w-cornerRad*2/3, rects[i].h-cornerRad*2/3);
-            anim[i].shadow = new createjs.Shadow(coloredKey[nowPage][i], 0, 0, cornerRad*2);
+            // Outer Glow Version
+            anim[i].graphics.setStrokeStyle(cornerRad/2, "round", "round", cornerRad).beginStroke(coloredKey[i]).beginFill("transparent").drawRect(rects[i].x+cornerRad/3, rects[i].y+cornerRad/3, rects[i].w-cornerRad*2/3, rects[i].h-cornerRad*2/3);
+            anim[i].shadow = new createjs.Shadow(coloredKey[i], 0, 0, cornerRad*2);
             stage.addChild(anim[i]);
         }
         else continue;
@@ -295,11 +320,11 @@ function animatecanv(key){
         ctx.fillStyle=baseColor;
         ctx.strokeRect(rects[key].x+cornerRad/2, rects[key].y+cornerRad/2, rects[key].w-cornerRad, rects[key].h-cornerRad);
         ctx.fillRect(rects[key].x+cornerRad/2, rects[key].y+cornerRad/2, rects[key].w-cornerRad, rects[key].h-cornerRad);
-        if(pressedKey[nowPage][key]>0)
+        if(pressedKey[key]>0)
         {
             ctx.lineJoin="round";
             ctx.lineWidth = cornerRad/(keyY*0.25);
-            ctx.strokeStyle=coloredKey[nowPage][key];
+            ctx.strokeStyle=coloredKey[key];
             ctx.strokeRect(rects[key].x+cornerRad/3, rects[key].y+cornerRad/3, rects[key].w-cornerRad*2/3, rects[key].h-cornerRad*2/3);
         }
     }
@@ -329,7 +354,7 @@ window.addEventListener("keydown", function(e) {
         {
             var keyNum = keyList.indexOf(e.keyCode);
             if(keyTest[nowPage][keyNum].length > 0)
-                keyLED1(keyNum, counter[nowPage][keyNum], 0);
+                keyLED1(nowPage, keyNum, counter[nowPage][keyNum], 0);
             playAudio(nowPage, keyNum);
         }
         e.preventDefault();
@@ -433,21 +458,7 @@ function setProject() {
         getData(projectName+'/autoPlay', function(result){
             autoData = result.msg;
             document.getElementById("AutoData").innerText="AutoData:Loaded";
-        });
-    
-        oriPressedKey.length=0;
-        oriColoredKey.length=0;
-        for(var i=0; i<chain; i++)
-        {
-            oriPressedKey[i] = [];
-            oriColoredKey[i] = [];
-            for(var j=0; j<keyX*keyY; j++)
-            {
-                oriPressedKey[i][j] = 0;
-                oriColoredKey[i][j] = strokeColor;
-            }
-        }
-    
+        }); 
         stopT();
     });
 }
@@ -484,23 +495,26 @@ function autoProcess(tt) {
         if(tCase == 'c' || tCase == "chain")
         {
             nowPage = parseInt(temp[1])-1;
-            //render();
-            // If want initialize button colors when page changed
-            initz();
+            render();
         }
         //if need duration to autoplay
         else if(tCase == 'd' || tCase == 'delay')
             dur += parseInt(temp[1]);
         //LED On
-        else if(tCase == 'o')
+        else if(tCase == 'o' || tCase == 'on')
         {
             var keyNum = (parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1);
             if(keyTest[nowPage][keyNum].length > 0)
-                keyLED1(keyNum, counter[nowPage][keyNum], 0);
+                keyLED1(nowPage, keyNum, counter[nowPage][keyNum], 0);
             playAudio(nowPage, keyNum);
         }
-        //LED Off
-        else if(tCase == 'f')
+        //LED Off... but looks not good
+        // else if(tCase == 'f' || tCase == 'off')
+        // {
+        //     var keyNum = (parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1);
+        //     if(keyTest[nowPage][keyNum].length > 0)
+        //         keyLED2(nowPage, keyNum, counter[nowPage][keyNum], 0);
+        // }
 
         //Recursively Turn on/off LED
         dur--;
@@ -511,12 +525,15 @@ function autoProcess(tt) {
         else
             autoProcess(++tt);
     }
+    else
+        stopT();
 }
 
 //LED ON(without color)
 function onLED(page, key) {
-    pressedKey[page][key] = 1;
-    if(mobile){
+    pressedKey[key] = 1;
+    coloredKey[key] = keyColor[120];
+    if(mobile || IE){
         requestAnimationFrame(function(){
             animatecanv(key);
         });
@@ -526,13 +543,13 @@ function onLED(page, key) {
 //LED ON(with color)
 function onLED2(page, key, color)
 {
-    pressedKey[page][key] = 1;
+    pressedKey[key] = 1;
     if(parseInt(color) < keyColor.length)
-        coloredKey[page][key] = keyColor[parseInt(color)];
+        coloredKey[key] = keyColor[parseInt(color)];
     else    //if color is out of velocity, change color code to RGB
-        coloredKey[page][key] = s2c(color);
+        coloredKey[key] = s2c(color);
 
-    if(mobile){
+    if(mobile || IE){
         requestAnimationFrame(function(){
             animatecanv(key);
         });
@@ -541,8 +558,8 @@ function onLED2(page, key, color)
 
 //LED OFF
 function offLED(page, key) {
-    pressedKey[page][key] = 0;
-    if(mobile){
+    pressedKey[key] = 0;
+    if(mobile || IE){
         requestAnimationFrame(function(){
             animatecanv(key);
         });
@@ -550,17 +567,17 @@ function offLED(page, key) {
 }
 
 //LED set Process
-function keyLED1(key, cnt, tt) {
+function keyLED1(page, key, cnt, tt) {
     var dur=0;
 
-    var temp = keyTest[nowPage][key][cnt];
+    var temp = keyTest[page][key][cnt];
     //if there isn't LEDSET
     if(typeof temp == 'undefined')
         cnt = 0;
     
-    temp = keyTest[nowPage][key][cnt][tt];
+    temp = keyTest[page][key][cnt][tt];
     
-    if(tt < keyTest[nowPage][key][cnt].length)
+    if(tt < keyTest[page][key][cnt].length)
     {
         var str = temp.split(' ');
         var sCase = str[0].toLowerCase();   //string checker
@@ -571,11 +588,11 @@ function keyLED1(key, cnt, tt) {
                 dur += parseInt(str[1]);
             else if(sCase == 'o' || sCase == 'on')
                 if(str[3].toLowerCase() == 'a' || str[3].toLowerCase() == 'auto')
-                    onLED2(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1), str[4]);
+                    onLED2(page, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1), str[4]);
                 else
-                    onLED2(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1), str[3]);
+                    onLED2(page, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1), str[3]);
             else if(sCase == 'f' || sCase == 'off')
-                offLED(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1));
+                offLED(page, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1));
         }
 
         dur--;
@@ -583,26 +600,30 @@ function keyLED1(key, cnt, tt) {
             dur = 0;
 
         if(dur >= 1)
-            st = setTimeout(keyLED1,dur,key,cnt,tt+1);
+            st = setTimeout(keyLED1,dur,page,key,cnt,tt+1);
         else
-            keyLED1(key, cnt, tt+1);
+            keyLED1(page, key, cnt, tt+1);
     }
 }
 
 //code for off the keyLED.. but not use
-function keyLED2(key, tt) {
-    var temp = keyTest[nowPage][key][counter[nowPage][key]][tt];
-    if(tt < keyTest[nowPage][key][counter[nowPage][key]].length && temp.length > 0)
-    {
-        var str = temp.split(' ');
-        var sCase = str[0].toLowerCase();
-        if(str.length > 0)
-            if(sCase == 'o' || sCase == 'f' || sCase == 'on' || sCase == 'off')
-                offLED(nowPage, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1));
-
-        keyLED2(key, tt+1);
-    }
-}
+// function keyLED2(page, key, cnt, tt) {
+//     var temp = keyTest[nowPage][key][cnt];
+//     //if there isn't LEDSET
+//     if(typeof temp == 'undefined')
+//         cnt = 0;
+    
+//     temp = keyTest[nowPage][key][cnt][tt];
+//     if(tt < keyTest[page][key][cnt].length)
+//     {
+//         var str = temp.split(' ');
+//         var sCase = str[0].toLowerCase();
+//         if(str.length > 0)
+//             if(sCase == 'o' || sCase == 'f' || sCase == 'on' || sCase == 'off')
+//                 offLED(page, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1));
+//         keyLED2(page, key, cnt, tt+1);
+//     }
+// }
 
 //stop auto process
 function stopT() {
@@ -610,6 +631,7 @@ function stopT() {
     clearTimeout(st);
     autoP = false;
     initz();
+    render();
 }
 
 //color chage code
@@ -637,11 +659,12 @@ function arrinit() {
     keyTest.length=0;
     audioInstance.length=0;
     anim.length=0;
+    drect.length=0;
+    dcir.length=0;
     for(var j = 0 ; j < chain; j++)
     {
         sound[j] = [];
         audio[j] = [];
-        pressedKey[j] = [];
         coloredKey[j] = [];
         keyCount[j] = [];
         counter[j] = [];
@@ -650,8 +673,8 @@ function arrinit() {
         {
             sound[j][i] = [];
             audio[j][i] = [];
-            pressedKey[j][i] = 0
-            coloredKey[j][i] = "#FF0000";
+            pressedKey[i] = 0
+            coloredKey[i] = "#FF0000";
             keyCount[j][i] = 0;
             counter[j][i] = 0;
             keyTest[j][i] = [];
@@ -661,7 +684,6 @@ function arrinit() {
 
 //button led initializer
 function initz() {
-    pressedKey[nowPage].fill(0);
-    coloredKey[nowPage].fill(strokeColor);
-    render();
+    pressedKey.fill(0);
+    coloredKey.fill(strokeColor);
 }
