@@ -28,7 +28,7 @@
 [![LPSJ2](https://github.com/rouismia/LaunchPAD_JS/blob/V_1.1/img/V1.1/Shape%20of%20You.gif?raw=true)](https://www.youtube.com/watch?v=2ftGpc4Q06s&feature=youtu.be "LPSJ2")
 # Used API
 
-	CreateJS-SoundJS : https://github.com/CreateJS
+	CREATEJS(EASELJS/SOUNDJS) : https://github.com/CreateJS or https://createjs.com/
 	
 # Support Browser, Env
 	Except IE, any other browsers are supported
