@@ -29,6 +29,7 @@
 # Used API
 
 	CREATEJS(EASELJS/SOUNDJS) : https://github.com/CreateJS or https://createjs.com/
+	JSZIP : https://stuk.github.io/jszip/
 	
 # Support Browser, Env
 	Except IE, any other browsers are supported
