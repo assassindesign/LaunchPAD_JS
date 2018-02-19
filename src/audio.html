@@ -18,8 +18,11 @@
         <script type="text/javascript" src="lib/jquery-ui.min.js"></script>
         <script type="text/javascript" src="lib/audio.js"></script>
         <script type="text/javascript" src="lib/createjs.min.js"></script>
+        <script type="text/javascript" src="lib/jszip.min.js"></script>
         <canvas id='canv'></canvas>
         <div align="center">
+            <input id="zipUp" name="PJ" type="file" accept="application/zip" onchange="setProjectFile()"/>
+            <button onclick="setTest()">File SET</button>
             <select id="Selector" name="Songs"></select>
             <button onclick="setProject()">SET</button>
             <button onclick="auto()">AutoPlay</button>
