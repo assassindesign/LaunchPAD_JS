@@ -362,7 +362,9 @@ window.addEventListener("keydown", function(e) {
 function playAudio(page, key) {
     if(audio[page][key][counter[page][key]])
     {
-        createjs.Sound.play(audio[page][key][counter[page][key]],{interrupt: createjs.Sound.INTERRUPT_ANY});
+        sound[page][key][counter[page][key]].currentTime = 0;
+        sound[page][key][counter[page][key]].play();
+        //createjs.Sound.play(audio[page][key][counter[page][key]],{interrupt: createjs.Sound.INTERRUPT_ANY});
         counter[page][key] = (counter[page][key]+1)%keyCount[page][key];
     }
 }
@@ -384,78 +386,199 @@ function setProject() {
 
     //get all data
     getData(projectName+'/info', function(result){
-        info = result.msg;
-        for(var i = 0 ; i < info.length ; i++)
-        {
-            var str = info[i].split('=');
-            if(str[0] == "chain")
-                chain = parseInt(str[1]);
-            if(str[0] == "buttonX")
-                keyX = parseInt(str[1]);
-            if(str[0] == "buttonY")
-                keyY = parseInt(str[1]);
-        }
-        arrinit();
-        stage.removeAllChildren();
-        stage.clear();
-        render();
-        document.getElementById("Info").innerText="Info:Loaded";
-
+        setInfo(result.msg);
         initBtnEL();
-
         getData(projectName+'/keySound', function(result){
-            var keyS = result.msg;
-            for(var i=0; i < keyS.length; i++)
-            {
-                var str = keyS[i].split(' ');
-                if(str.length == 4)
-                {
-                    var page = parseInt(str[0])-1;
-                    var num = ((parseInt(str[1])-1)*keyY)+(parseInt(str[2])-1);
-                    sound[page][num].push('Server/'+projectName+'/sounds/'+str[3]);
-                    audio[page][num][keyCount[page][num]] = str[3];
-                    createjs.Sound.registerSound(sound[page][num][keyCount[page][num]], audio[page][num][keyCount[page][num]], 1);
-                    keyCount[page][num]++;
-                }
-                else continue;
-            }
-            document.getElementById("KeySound").innerText="KeySound:Loaded";
+            setKey(result.msg);
         });
-        
         getData(projectName+"/LEDList", function(result){
-            LEDList = result.msg;
-    
-            for(var p = 0 ; p < LEDList.length; p++)
-            {
-                (function(p){
-                    var tmp = LEDList[p].split(' ');
-                    getData(projectName+"/keyLED/"+LEDList[p], function(result){
-    
-                        var pNum = parseInt(tmp[0])-1;
-                        var keyNum = (parseInt(tmp[1])-1)*keyX+(parseInt(tmp[2])-1);
-                        keyTest[pNum][keyNum].push(result.msg);
-                        var keyCnt = keyTest[pNum][keyNum].length-1;
-                        for(ir=0; ir<parseInt(tmp[3])-1; ir++)
-                            keyTest[pNum][keyNum][keyCnt] = keyTest[pNum][keyNum][keyCnt].concat(result.msg);
-                    });
-                })(p);
-            }
-            document.getElementById("LEDList").innerText="LEDList:Loaded";
+            setLED(result.msg);
         });
-    
         autoData.length=0;
         keyColor.length=0;
-    
         for(var pp = 0 ; pp < velocity.length; pp++){
             velocity[pp] = velocity[pp].replace(/\./gi,',');
             keyColor[pp] = "rgba("+velocity[pp]+opacity;
         }
-    
         getData(projectName+'/autoPlay', function(result){
             autoData = result.msg;
             document.getElementById("AutoData").innerText="AutoData:Loaded";
         });
     });
+}
+
+function setInfo(content){
+    for(var i = 0 ; i < content.length ; i++)
+    {
+        var str = content[i].split('=');
+        if(str[0] == "chain")
+            chain = parseInt(str[1]);
+        if(str[0] == "buttonX")
+            keyX = parseInt(str[1]);
+        if(str[0] == "buttonY")
+            keyY = parseInt(str[1]);
+    }
+    arrinit();
+    stage.removeAllChildren();
+    stage.clear();
+    render();
+    document.getElementById("Info").innerText="Info:Loaded";
+}
+
+function setKey(content){
+    for(var i=0; i < content.length; i++)
+    {
+        var str = content[i].split(' ');
+        if(str.length == 4)
+        {
+            var page = parseInt(str[0])-1;
+            var num = ((parseInt(str[1])-1)*keyY)+(parseInt(str[2])-1);
+            sound[page][num].push(new Audio('Server/'+projectName+'/sounds/'+str[3]));
+            audio[page][num][keyCount[page][num]] = str[3];
+            //createjs.Sound.registerSound(sound[page][num][keyCount[page][num]], audio[page][num][keyCount[page][num]], 1);
+            keyCount[page][num]++;
+        }
+        else continue;
+    }
+    document.getElementById("KeySound").innerText="KeySound:Loaded";
+}
+
+function setLED(content){
+    for(var p = 0 ; p < content.length; p++)
+    {
+        (function(p){
+            var tmp = content[p].split(' ');
+            getData(projectName+"/keyLED/"+content[p], function(result){
+                var pNum = parseInt(tmp[0])-1;
+                var keyNum = (parseInt(tmp[1])-1)*keyX+(parseInt(tmp[2])-1);
+                keyTest[pNum][keyNum].push(result.msg);
+                var keyCnt = keyTest[pNum][keyNum].length-1;
+                for(ir=0; ir<parseInt(tmp[3])-1; ir++)
+                    keyTest[pNum][keyNum][keyCnt] = keyTest[pNum][keyNum][keyCnt].concat(result.msg);
+            });
+        })(p);
+    }
+    document.getElementById("LEDList").innerText="LEDList:Loaded";
+}
+
+var sList = [];
+var lstring = [];
+var ablob = [];
+var dirs = [];
+
+function handleFile(f){
+    var title = f.name;
+    var dateBefore = new Date();
+    JSZip.loadAsync(f)
+    .then(function(zip){
+        var dateAfter = new Date();
+        zip.forEach(function(relativePath, zipEntry){
+            if(zipEntry.name.toLowerCase() == "info"){
+                zipEntry.async("string")
+                .then(function(content){
+                    setInfo(content.split('\n'));
+                });
+            } else if(zipEntry.name.toLowerCase() == "autoplay"){
+                zipEntry.async("string")
+                .then(function(content){
+                    autoData = content.split('\n');
+                    document.getElementById("AutoData").innerText="AutoData:Loaded";
+                });
+            } else if(zipEntry.name.toLowerCase() == "keysound"){
+                zipEntry.async("string")
+                .then(function(content){
+                    sList = content.split('\n');
+                });
+            }
+            if(zipEntry.dir == true){
+                dirs.push(relativePath.replace(/\//gi, ''));
+            }
+        });
+        for(var i = 0 ; i < dirs.length; i++){
+            if(dirs[i].toLowerCase() == "sounds")
+                zip.folder(dirs[i]).forEach(function(relativePath, zipEntry){
+                    zip.file(zipEntry.name).async("blob")
+                    .then(function(blob){
+                        ablob[0].push(relativePath);
+                        ablob[1].push(URL.createObjectURL(blob));
+                    });
+                });
+            else if(dirs[i].toLowerCase() == "keyled")
+                zip.folder(dirs[i]).forEach(function(relativePath, zipEntry){
+                    zip.file(zipEntry.name).async("string")
+                    .then(function(content){
+                        if(relativePath.split('.').length == 1){
+                            lstring[0].push(relativePath);
+                            lstring[1].push(content);
+                        }
+                    });
+                });
+        }
+    });
+}
+
+function setKeyZip(content){
+    for(var i=0; i < content.length; i++)
+    {
+        var str = content[i].split(' ');
+        if(str.length == 4)
+        {
+            var page = parseInt(str[0])-1;
+            var num = ((parseInt(str[1])-1)*keyY)+(parseInt(str[2])-1);
+            var stmp = ablob[0].indexOf(str[3].replace(/\r/gi,""));
+            if( stmp >-1 ){
+                audio[page][num][keyCount[page][num]] = ablob[0][stmp];
+                sound[page][num].push(new Audio(ablob[1][stmp]));
+                //createjs.Sound.alternateExtensions = ["mp3", "ogg", "wav"];
+                //createjs.Sound.registerSound(sound[page][num][keyCount[page][num]], audio[page][num][keyCount[page][num]], 1);
+                keyCount[page][num]++;
+            }
+        }
+        else continue;
+    }
+    document.getElementById("KeySound").innerText="KeySound:Loaded";
+}
+
+function setLEDZip(content){
+    for(var p = 0 ; p < content[0].length; p++)
+    {
+        var tmp = content[0][p].split(' ');
+        var ltmp = content[1][p].split('\n')
+        var pNum = parseInt(tmp[0])-1;
+        var keyNum = (parseInt(tmp[1])-1)*keyX+(parseInt(tmp[2])-1);
+        keyTest[pNum][keyNum].push(ltmp);
+        var keyCnt = keyTest[pNum][keyNum].length-1;
+        for(ir=0; ir<parseInt(tmp[3])-1; ir++){
+            keyTest[pNum][keyNum][keyCnt] = keyTest[pNum][keyNum][keyCnt].concat(ltmp);
+        }
+    }
+    document.getElementById("LEDList").innerText="LEDList:Loaded";
+}
+
+// set project
+function setProjectFile() {
+    stopT();    // if autoplay process turned on, then off
+    nowPage = 0;
+    LoadingStatus();    // set all message to loading
+
+    autoData.length=0;
+    keyColor.length=0;
+    for(var pp = 0 ; pp < velocity.length; pp++){
+        velocity[pp] = velocity[pp].replace(/\./gi,',');
+        keyColor[pp] = "rgba("+velocity[pp]+opacity;
+    }
+
+    var files = document.getElementById("zipUp");
+
+    for(var i = 0 ; i < files.files.length; i++)
+        handleFile(files.files[i]);
+
+    render();
+}
+
+function setTest() {
+    setKeyZip(sList);
+    setLEDZip(lstring);
 }
 
 // to get data, use AJAX
@@ -571,7 +694,7 @@ function keyLED1(page, key, cnt, tt) {
         cnt = 0;
     
     temp = keyTest[page][key][cnt][tt];
-    
+
     if(tt < keyTest[page][key][cnt].length)
     {
         var str = temp.split(' ');
@@ -645,6 +768,17 @@ function s2c(str) {
 
 // init all arrays
 function arrinit() {
+    // zip init
+    ablob.length=0;
+    lstring.length=0;
+    sList.length=0;
+    ablob = [];
+    lstring = [];
+    ablob[0] = [];
+    ablob[1] = [];
+    lstring[0] = [];
+    lstring[1] = [];
+    // songs list init
     sound.length = 0;
     audio.length = 0;
     pressedKey.length = 0;
