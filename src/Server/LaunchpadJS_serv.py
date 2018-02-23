@@ -22,7 +22,6 @@ fd = codecs.open("Songs", "w", "utf-8")
 fDir = getFile("Projects")
 for dir1 in fDir:
     dir1 = os.path.join(os.path.normpath("Projects"),dir1)
-    print(dir1)
     if os.path.isdir(dir1):
         fd.write(os.path.basename(dir1)+'\n')
         fd2 = codecs.open(os.path.join(dir1, "LEDList"),"w","utf-8")
@@ -51,7 +50,6 @@ def support_jsonp(kwd):
         callback = request.args.get('callback', False)
         if callback:
             content = str(callback) + '(' + str(kwd().data.decode('UTF-8')) + ')'
-            print(content)
             return current_app.response_class(content, mimetype='application/jsonp')
         else:
             return f(*args, **kwargs)
@@ -62,7 +60,7 @@ def support_jsonp(kwd):
 def postJsonHandler():
     getmsg = request.args.get('msg')
     tmpp = json.loads(getmsg)
-
+    
     return jsonify({"msg":getData(tmpp)})
 
 if __name__ == "__main__":

@@ -24,10 +24,14 @@ var autoData = [];                          //auto process data
 var cirs = [];                              //page button position
 var cirs2 = [];                             //page button obj
 var rects = [];                             //button obj
+var rects2 = [];
+var velrects = [];
+var veldrects = [];
 var anim = [];                              //button LED animation arr
 var drect = [];
+var drect2 = [];
 var dcir = [];
-var bg;
+var bg, bg2;
 var canvas;                                 
 var nowPage = 0;
 var projectName;                            //Song name
@@ -38,6 +42,15 @@ var autoP = false;                          //auto process status
 var stage;                                  //var for easelJS canvas control
 var st;                                     //setTimer var
 var keyTest = [];                           //for LEDList Test
+
+var autoE;
+var keyE;
+var ledE;
+
+var aFile = [];
+var choosedcolor = 0;
+var pageKeyColor = [];
+var choosedkey;
 
 //Script for Array Initialization
 if (!Array.prototype.fill) {
@@ -99,6 +112,7 @@ window.onload = function() {
         if(0 > filter.indexOf(navigator.platform.toLowerCase())){
             //alert("Mobile");
             mobile = true;
+
             document.getElementById("Env").innerText = "Mobile";
         }
         else{
@@ -118,43 +132,54 @@ window.onload = function() {
         }
     }
 
-    // get canvas, context, stage
-    canvas = document.getElementById('canv');
-    ctx = canvas.getContext('2d');
-    stage = new createjs.Stage("canv");
+    if(!mobile){
+        // get canvas, context, stage
+        canvas = document.getElementById('canv');
+        ctx = canvas.getContext('2d');
+        stage = new createjs.Stage("canv");
 
-    // get Combo Box ctx
-    select = document.getElementById("Selector");
-    getData("./Songs", function(result){
-        songs = result.msg;
-        for(var s = 0; s < songs.length; s++){
-            var option = document.createElement('option');
-            option.value = s;
-            option.text = songs[s].split('\n')[0];
-            select.add(option);
-        }
-    });
+        autoE = document.getElementById("autoEditor");
+        keyE = document.getElementById("keyEditor");
+        ledE = document.getElementById("ledEditor");
 
-    // set LED Color
-    getData("./Velocity", function(result){
-        velocity = result.msg;
-        document.getElementById("Velocity").innerText="Velocity:Loaded";
-    });
+        // get Combo Box ctx
+        select = document.getElementById("Selector");
+        getData("./Songs", function(result){
+            songs = result.msg;
+            for(var s = 0; s < songs.length; s++){
+                var option = document.createElement('option');
+                option.value = s;
+                option.text = songs[s].split('\n')[0];
+                select.add(option);
+            }
+        });
 
-    // initialize all arrays
-    arrinit();
-
-    cnv2Resize();
-    window.addEventListener('resize',function(){
-        clearTimeout(timer);
-        timer = setTimeout(cnv2Resize, 300);
-    }, false);
+        // set LED Color
+        getData("./Velocity", function(result){
+            velocity = result.msg;
+            keyColor.length=0;
+            for(var pp = 0 ; pp < velocity.length; pp++){
+                velocity[pp] = velocity[pp].replace(/\./gi,',');
+                keyColor[pp] = "rgba("+velocity[pp]+opacity;
+            }
+            // initialize all arrays
+            arrinit();
+            cnv2Resize();
+            window.addEventListener('resize',function(){
+                clearTimeout(timer);
+                timer = setTimeout(cnv2Resize, 300);
+            }, false);
+            document.getElementById("Velocity").innerText="Velocity:Loaded";
+        });
+    }
+    else
+        alert("Mobile is not supported")
 }
 
 // if browser size change, dynamically set size to fit browsers'
 function cnv2Resize() {
     canvas.width = window.innerWidth*19/20;
-    canvas.height = window.innerHeight*19/20;
+    canvas.height = window.innerHeight*19/40;
 
     initBtnEL();
 
@@ -164,13 +189,40 @@ function cnv2Resize() {
 // initialize touch/click listener
 function initBtnEL(){
     if(!mobile) {
+        canvas.removeEventListener('dblclick', dblClicked, false);
+        canvas.addEventListener('dblclick', dblClicked, false);
         canvas.removeEventListener('click', Clicked, false);
         canvas.addEventListener('click', Clicked, false);
+        autoE.removeEventListener("dblclick", sdbc);
+        autoE.addEventListener("dblclick", sdbc);
     }
     else {
         canvas.removeEventListener('touchstart', Touched);
         canvas.addEventListener('touchstart', Touched);
     }
+}
+
+// Mobile Touch process, allow multi touches
+function Touched(ev){
+    var touch;
+    touch = ev.touches;
+    for(ii = 0 ; ii < touch.length; ii++)
+    {
+        collides(touch[ii].pageX, touch[ii].pageY);
+        collides2(touch[ii].pageX, touch[ii].pageY);
+    }
+}
+
+// PC Click process
+function Clicked(e) {
+    collides(e.offsetX, e.offsetY);
+    collides2(e.offsetX, e.offsetY);
+    collides3(e.offsetX, e.offsetY, 0);
+    collides4(e.offsetX, e.offsetY);
+}
+
+function dblClicked(e) {
+    collides3(e.offsetX, e.offsetY, 1);
 }
 
 // button click/touch offset checker
@@ -184,13 +236,21 @@ function collides(x, y) {
             && bottom >= y
             && top <= y) {
             isCollision = rects[i];
-            if(audio[nowPage][i][counter[nowPage][i]])
-            {
-                if(keyTest[nowPage][i].length > 0)
-                    keyLED1(nowPage, i, counter[nowPage][i], 0)
-                playAudio(nowPage,i);
+            
+            if(event.ctrlKey)
+                myFunction(nowPage, i);
+            else{
+                choosedkey = i;
+                if(keyTest[nowPage][i][counter[nowPage][i]])
+                    ledE = setOptList(ledE, keyTest[nowPage][i][counter[nowPage][i]]);
+                if(audio[nowPage][i][counter[nowPage][i]])
+                {
+                    if(keyTest[nowPage][i].length > 0)
+                        keyLED1(nowPage, i, counter[nowPage][i], 0)
+                    playAudio(nowPage,i);
+                }
+                else return null;
             }
-            else return null;
         }
     }
     return isCollision;
@@ -214,48 +274,121 @@ function collides2(x, y) {
     return isCollision;
 }
 
+var keyLEDList = [];
+
+function collides3(x, y, evt) {
+    var isCollision = false;
+    for (var i = 0, len = rects2.length; i < len; i++) {
+        var left = rects2[i].x, right = rects2[i].x+rects2[i].w;
+        var top = rects2[i].y, bottom = rects2[i].y+rects2[i].h;
+        if (right >= x
+            && left <= x
+            && bottom >= y
+            && top <= y) {
+            isCollision = rects2[i];
+            if(!event.ctrlKey){
+                pageKeyColor[nowPage][i] = keyColor[choosedcolor];
+                keyLEDList[nowPage][choosedkey].push((nowPage+1)+" "+(parseInt(i/8)+1)+" "+((i%8)+1));
+                console.log(keyLEDList[nowPage][i]);
+                ledE = setOptList(ledE, keyLEDList[nowPage][choosedkey]);
+            }
+            else {
+                pageKeyColor[nowPage][i] = baseColor;
+            }
+        }
+    }
+    return isCollision;
+}
+
+function collides4(x, y) {
+    var isCollision = false;
+    for (var i = 0, len = velrects.length; i < len; i++) {
+        var left = velrects[i].x, right = velrects[i].x+velrects[i].w;
+        var top = velrects[i].y, bottom = velrects[i].y+velrects[i].h;
+        if (right >= x
+            && left <= x
+            && bottom >= y
+            && top <= y) {
+            isCollision = velrects[i];
+            choosedcolor = i;
+            console.log(i);
+        }
+    }
+    return isCollision;
+}
+
 // keyDown/Up listener
-var keysDown = {};
-window.addEventListener('keydown', function(e) {
-    keysDown[e.keyCode] = true;
-});
-window.addEventListener('keyup', function(e) {
-    delete keysDown[e.keyCode];
-});
+// var keysDown = {};
+// window.addEventListener('keydown', function(e) {
+//     keysDown[e.keyCode] = true;
+// });
+// window.addEventListener('keyup', function(e) {
+//     delete keysDown[e.keyCode];
+// });
+
+function myFunction(x, y) {
+    cspace[x][y].classList.toggle("show");
+}
+
+function resetFile(){
+    selinit();
+    arrinit();
+    LoadingStatus();
+}
+
+var vt = [];
 
 // Launchpad Canvas Renderer
 function render() {
-    if(canvas && stage){
+    var siz = canvas.width > canvas.height ? canvas.height : canvas.width;
+    var cornerRad = siz/(keyX*keyY);
+
+    if(canvas && stage && (canvas.width >= 3.74*canvas.height)){
         // stage.removeAllChildren();
         // stage.clear();
-
-        var siz = canvas.width > canvas.height ? canvas.height : canvas.width;
-        var cornerRad = siz/(keyX*keyY);
 
         // for background
         stage.removeChild(bg);
         bg = new createjs.Shape();
         // background:dark gray
-        bg.graphics.beginFill("#444444").drawRoundRect(cornerRad/2, cornerRad/2, canvas.width-cornerRad, canvas.height-cornerRad, cornerRad);
+        bg.graphics.beginFill("#444444").drawRoundRect(0, 0, (canvas.width-cornerRad)/3, (canvas.height-cornerRad), cornerRad/2);
+        bg.graphics.beginFill("#444444").drawRoundRect((canvas.width-cornerRad+6)/3, 0, (canvas.width-cornerRad), (canvas.height-cornerRad), cornerRad/2);
         stage.addChild(bg);
 
-        // set buttons offset, draw buttons
         for(var i = 0 ; i < (keyX*keyY); i++){
-            rects[i] = {x: (canvas.width/2-(keyX/2)*siz/(keyX+1))+siz*(i%keyX)/(keyX+2), y: (canvas.height/2-(keyY/2)*siz/(keyY+2))+siz*parseInt(i/keyY)/(keyY+2), w: siz/(keyX+3), h: siz/(keyY+3)};
+            rects[i] = {x: (canvas.width/6-(keyX/2)*siz/(keyX+1))+siz*(i%keyX)/(keyX+2), y: (canvas.height/2-(keyY/2)*siz/(keyY+2))+siz*parseInt(i/keyY)/(keyY+2), w: siz/(keyX+3), h: siz/(keyY+3)};
+            rects2[i] = {x: (canvas.width/3+(keyX/8)*siz/(keyX+1))+siz*(i%keyX)/(keyX+2), y: (canvas.height/2-(keyY/2)*siz/(keyY+2))+siz*parseInt(i/keyY)/(keyY+2), w: siz/(keyX+3), h: siz/(keyY+3)};
             stage.removeChild(drect[i]);
+            stage.removeChild(drect2[i]);
             drect[i] = new createjs.Shape();
+            drect2[i] = new createjs.Shape();
             if(pressedKey[i]>0){
                 drect[i].graphics.setStrokeStyle(cornerRad/2, "round", "round", cornerRad).beginStroke(coloredKey[i]).beginFill(baseColor).drawRect(rects[i].x+cornerRad/3, rects[i].y+cornerRad/3, rects[i].w-cornerRad*2/3, rects[i].h-cornerRad*2/3);
                 if(!mobile && !IE)
                     drect[i].shadow = new createjs.Shadow(coloredKey[i], 0, 0, cornerRad*2);
             } else
                 drect[i].graphics.setStrokeStyle(cornerRad*4/5, "round", "round", cornerRad).beginStroke(strokeColor).beginFill(baseColor).drawRect(rects[i].x+cornerRad/2, rects[i].y+cornerRad/2, rects[i].w-cornerRad, rects[i].h-cornerRad);
+            drect2[i].graphics.setStrokeStyle(cornerRad*4/5, "round", "round", cornerRad).beginStroke(strokeColor).beginFill(pageKeyColor[nowPage][i]).drawRect(rects2[i].x+cornerRad/2, rects2[i].y+cornerRad/2, rects2[i].w-cornerRad, rects2[i].h-cornerRad);
             stage.addChild(drect[i]);
+            stage.addChild(drect2[i]);
+        }
+
+        for(var i = 0 ; i < keyColor.length; i++){
+            velrects[i] = {x: (canvas.width/3+(1.1*8)*siz/(8+1))+siz*(i%(8+10))/(8+4), y: (canvas.height/2-(8/2)*siz/(8+2))+siz*parseInt(i/(8+10))/(8+4), w: siz/(8+4), h: siz/(8+4)};
+            stage.removeChild(veldrects[i]);
+            stage.removeChild(vt[i]);
+            vt[i] = new createjs.Text(i, siz/32+"px Arial", "#FF7700");
+            vt[i].x = (velrects[i].x+siz/64);
+            vt[i].y = (velrects[i].y+siz/64);
+            veldrects[i] = new createjs.Shape();
+            veldrects[i].graphics.beginFill(keyColor[i]).drawRect(velrects[i].x+siz/128, velrects[i].y+siz/128, velrects[i].w-siz/64, velrects[i].h-siz/64);
+            stage.addChild(veldrects[i]);
+            stage.addChild(vt[i]);
         }
 
         for(var i = 0 ; i < chain; i++){
             cirs[i] = {x: rects[(i+1)*keyX-1].x+rects[0].w+cornerRad/2, y: rects[(i+1)*keyX-1].y, w: rects[(i+1)*keyX-1].w, h: rects[(i+1)*keyX-1].h};
-            cirs2[i] = {x: cirs[i].x+rects[0].w/2, y:cirs[i].y+rects[0].h/2, w:(cirs[i].w-cornerRad/2)/2, h:(cirs[i].w-cornerRad/2)/2};
+            //cirs2[i] = {x: cirs[i].x+rects[0].w/2, y:cirs[i].y+rects[0].h/2, w:(cirs[i].w-cornerRad/2)/2, h:(cirs[i].w-cornerRad/2)/2};
             stage.removeChild(dcir[i]);
             dcir[i] = new createjs.Shape();
             dcir[i].graphics.setStrokeStyle(cornerRad/2);
@@ -321,37 +454,6 @@ function animatecanv(key){
     }
 }
 
-// Mobile Touch process, allow multi touches
-function Touched(ev){
-    var touch;
-    touch = ev.touches;
-    for(ii = 0 ; ii < touch.length; ii++)
-    {
-        collides(touch[ii].pageX, touch[ii].pageY);
-        collides2(touch[ii].pageX, touch[ii].pageY);
-    }
-}
-
-// PC Click process
-function Clicked(e) {
-    collides(e.offsetX, e.offsetY);
-    collides2(e.offsetX, e.offsetY);
-}
-
-// PC Button Keyboard Input Listener
-window.addEventListener("keydown", function(e) {
-    if(keyList.indexOf(e.keyCode) > -1) {
-        if(audio[nowPage][keyList.indexOf(e.keyCode)][counter[nowPage][keyList.indexOf(e.keyCode)]])
-        {
-            var keyNum = keyList.indexOf(e.keyCode);
-            if(keyTest[nowPage][keyNum].length > 0)
-                keyLED1(nowPage, keyNum, counter[nowPage][keyNum], 0);
-            playAudio(nowPage, keyNum);
-        }
-        e.preventDefault();
-    }
-}, false);
-
 // Audio Play Process
 function playAudio(page, key) {
     if(audio[page][key][counter[page][key]])
@@ -388,18 +490,68 @@ function setProject() {
         getData(projectName+"/LEDList", function(result){
             setLED(result.msg);
         });
-        autoData.length=0;
-        keyColor.length=0;
-        for(var pp = 0 ; pp < velocity.length; pp++){
-            velocity[pp] = velocity[pp].replace(/\./gi,',');
-            keyColor[pp] = "rgba("+velocity[pp]+opacity;
-        }
         getData(projectName+'/autoPlay', function(result){
+            autoData.length=0;
             autoData = result.msg;
             document.getElementById("AutoData").innerText="AutoData:Loaded";
         });
     });
 }
+
+function setOptList(cList, content){
+    cList.options.length=0;
+    for(var i = 0 ; i < content.length; i++){
+        var option = document.createElement("option");
+        option.text = content[i];
+        cList.add(option, i);
+    }
+    return cList;
+}
+
+function sc(ocase){
+    switch(ocase){
+        case 1:
+        optSet(autoE, "AutoData");
+        break;
+        case 2:
+        optSet(keyE, "KeyData");
+        break;
+        case 3:
+        optSet(ledE, "LEDData");
+        break;
+    }
+}
+
+function optSet(content, ename){
+    for(var i=0; i<content.options.length; i++){
+        if(content.options[i].selected){
+            document.getElementById("eName").innerText=ename;
+            document.getElementById("oIdx").innerText=i;
+            document.getElementById("oDesc").value=content.options[i].innerText;
+        }
+    }
+}
+
+function ksc(){
+    for(var i=0; i<keyE.options.length; i++){
+        if(keyE.options[i].selected){
+            document.getElementById("keyCNT").innerText=i;
+        }
+    }
+}
+
+function sdbc() {
+    for(var i=0; i<autoE.options.length; i++){
+        if(autoE.options[i].selected){
+            alert(autoData[i]+" removed!");
+            //autoData.splice(i, 1);
+            autoE.options[i].selected = false;
+            autoE = setOptList(autoE, autoData);
+        }
+    }
+}
+
+var cnode = [];
 
 function setInfo(content){
     for(var i = 0 ; i < content.length ; i++)
@@ -412,11 +564,46 @@ function setInfo(content){
         if(str[0] == "buttonY")
             keyY = parseInt(str[1]);
     }
+
     arrinit();
     stage.removeAllChildren();
     stage.clear();
     render();
+
+    setUpForm();
+
     document.getElementById("Info").innerText="Info:Loaded";
+}
+
+var cspan = [];
+var cspace = [];
+
+function setUpForm() {
+    var popup = document.getElementById('poptest');
+    while(popup.firstChild)
+        popup.removeChild(popup.firstChild);
+    cnode.length = 0;
+    cspan.length = 0;
+    cspace.length = 0;
+    for(var i = 0 ; i < chain; i++){
+        cnode[i] = [];
+        cspan[i] = [];
+        cspace[i] = [];
+        for(var j = 0 ; j < keyX*keyY; j++){
+            cspace[i][j] = document.createElement("div");
+            cspace[i][j].setAttribute('class', 'popuptext');
+            cspan[i][j] = document.createElement("span");
+            cspan[i][j].innerText = "Page:"+(i+1)+"/Button:"+(j+1);
+            cnode[i][j] = document.createElement("input");
+            cnode[i][j].setAttribute('type', 'file');
+            cnode[i][j].setAttribute('id', 'myPopup_'+i+"_"+j);
+            cnode[i][j].setAttribute('accept', 'audio/*');
+            cnode[i][j].setAttribute('multiple', "");
+            cspace[i][j].appendChild(cspan[i][j]);
+            cspace[i][j].appendChild(cnode[i][j]);
+            popup.appendChild(cspace[i][j]);
+        }
+    }
 }
 
 function setKey(content){
@@ -475,13 +662,16 @@ function handleFile(f){
             } else if(zipEntry.name.toLowerCase() == "autoplay"){
                 zipEntry.async("string")
                 .then(function(content){
+                    autoData.length=0;
                     autoData = content.split('\n');
+                    autoE = setOptList(autoE, autoData);
                     document.getElementById("AutoData").innerText="AutoData:Loaded";
                 });
             } else if(zipEntry.name.toLowerCase() == "keysound"){
                 zipEntry.async("string")
                 .then(function(content){
                     sList = content.split('\n');
+                    keyE = setOptList(keyE, sList);
                 });
             }
             if(zipEntry.dir == true){
@@ -570,7 +760,23 @@ function setProjectFile() {
     render();
 }
 
-function setTest() {
+function setNewPJ() {
+    var pjName = document.getElementById("pjName").value;
+    var pjChain = document.getElementById("pjChain").value;
+    var pjX = document.getElementById("pjX").value;
+    var pjY = document.getElementById("pjY").value;
+
+    chain = parseInt(pjChain);
+    keyX = parseInt(pjX);
+    keyY = parseInt(pjY);
+
+    selinit();
+    arrinit();
+
+    setUpForm();
+}
+
+function setFile() {
     setKeyZip(sList);
     setLEDZip(lstring);
 }
@@ -592,7 +798,14 @@ function getData(fName, callback) {
 function auto() {
     stopT();
     autoP = true;
-    autoProcess(0);
+    tt = 0;
+    for(var i=0; i<autoE.options.length; i++){
+        if(autoE.options[i].selected){
+            tt=i;
+            break;
+        }
+    }
+    autoProcess(tt);
 }
 
 // autoPlay Process
@@ -620,13 +833,6 @@ function autoProcess(tt) {
                 keyLED1(nowPage, keyNum, counter[nowPage][keyNum], 0);
             playAudio(nowPage, keyNum);
         }
-        //LED Off... but looks not good
-        // else if(tCase == 'f' || tCase == 'off')
-        // {
-        //     var keyNum = (parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1);
-        //     if(keyTest[nowPage][keyNum].length > 0)
-        //         keyLED2(nowPage, keyNum, counter[nowPage][keyNum], 0);
-        // }
 
         //Recursively Turn on/off LED
         dur--;
@@ -718,25 +924,6 @@ function keyLED1(page, key, cnt, tt) {
     }
 }
 
-//code for off the keyLED.. but not use
-// function keyLED2(page, key, cnt, tt) {
-//     var temp = keyTest[nowPage][key][cnt];
-//     //if there isn't LEDSET
-//     if(typeof temp == 'undefined')
-//         cnt = 0;
-    
-//     temp = keyTest[nowPage][key][cnt][tt];
-//     if(tt < keyTest[page][key][cnt].length)
-//     {
-//         var str = temp.split(' ');
-//         var sCase = str[0].toLowerCase();
-//         if(str.length > 0)
-//             if(sCase == 'o' || sCase == 'f' || sCase == 'on' || sCase == 'off')
-//                 offLED(page, (parseInt(str[1])-1)*keyY+(parseInt(str[2])-1));
-//         keyLED2(page, key, cnt, tt+1);
-//     }
-// }
-
 //stop auto process
 function stopT() {
     //all timer out
@@ -760,6 +947,12 @@ function s2c(str) {
     return colour;
 }
 
+function selinit() {
+    autoE.options.length = 0;
+    keyE.options.length = 0;
+    ledE.options.length = 0;
+}
+
 // init all arrays
 function arrinit() {
     // zip init
@@ -772,6 +965,7 @@ function arrinit() {
     ablob[1] = [];
     lstring[0] = [];
     lstring[1] = [];
+    aFile.length = 0;
     // songs list init
     sound.length = 0;
     audio.length = 0;
@@ -783,18 +977,25 @@ function arrinit() {
     audioInstance.length=0;
     anim.length=0;
     drect.length=0;
+    drect2.length=0;
+    veldrects.length=0;
     dcir.length=0;
     rects.length = 0;
+    rects2.length = 0;
+    velrects.length = 0;
     cirs.length = 0;
-    cirs2.length = 0;
+    pageKeyColor.length = 0;
+    keyLEDList.length = 0;
+    //cirs2.length = 0;
     for(var j = 0 ; j < chain; j++)
     {
         sound[j] = [];
         audio[j] = [];
-        coloredKey[j] = [];
         keyCount[j] = [];
         counter[j] = [];
         keyTest[j] = [];
+        pageKeyColor[j] = [];
+        keyLEDList[j] = [];
         for(var i = 0 ; i < keyX*keyY; i++)
         {
             sound[j][i] = [];
@@ -804,6 +1005,8 @@ function arrinit() {
             keyCount[j][i] = 0;
             counter[j][i] = 0;
             keyTest[j][i] = [];
+            pageKeyColor[j][i] = baseColor;
+            keyLEDList[j][i] = [];
         }
     }
 }

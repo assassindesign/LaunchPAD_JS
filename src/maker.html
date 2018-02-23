@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=0.5, user-scalable=no"/>
+        <style>
+            canvas {
+                padding-left: 0;
+                margin: auto;
+                display: block;
+                margin-bottom: 4px;
+            }
+
+            .editor {
+                margin: 1%;
+                width: 30%;
+                height: 100%;
+            }
+
+            .popup {
+                position: relative;
+                display: inline-block;
+                cursor: pointer;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+
+            /* The actual popup */
+            .popup .popuptext {
+                visibility: hidden;
+                width: 360px;
+                background-color: #888;
+                color: #fff;
+                text-align: center;
+                border-radius: 6px;
+                padding: 8px;
+                position: absolute;
+                z-index: 1;
+                bottom: -20px;
+                left: 100%;
+                margin-left: 500%;
+            }
+
+            /* Toggle this class - hide and show the popup */
+            .popup .show {
+                visibility: visible;
+                -webkit-animation: fadeIn 1s;
+                animation: fadeIn 1s;
+            }
+
+            /* Add animation (fade in the popup) */
+            @-webkit-keyframes fadeIn {
+                from {opacity: 0;} 
+                to {opacity: 1;}
+            }
+
+            @keyframes fadeIn {
+                from {opacity: 0;}
+                to {opacity:1 ;}
+            }
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript" src="lib/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript" src="lib/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="lib/maker.js"></script>
+        <script type="text/javascript" src="lib/createjs.min.js"></script>
+        <script type="text/javascript" src="lib/jszip.min.js"></script>
+        <canvas id='canv'></canvas>
+        <form class="popup" id="poptest"></form>
+        <div align="center">
+            <form>
+                <input id="zipUp" type="file" accept="application/zip" onchange="setProjectFile()"/>
+                <input type="reset" value="RESET" onclick="resetFile()"/>
+            </form>
+            <input type="text" id="pjName" placeholder="Song Name"/>
+            <input type="text" id="pjChain" style="width:2%" placeholder="Page"/>
+            <input type="text" id="pjX" style="width:2%" placeholder="X"/>
+            <input type="text" id="pjY" style="width:2%" placeholder="Y"/>
+            <button onclick="setNewPJ()">NEW Project</button>
+            <BR/>
+            <button onclick="setFile()">File SET</button>
+            <select style="display:none" id="Selector" name="Songs"></select>
+            <button style="display:none" onclick="setProject()">SET</button>
+            <span id="Velocity" style="display:none">Velocity:None</span>
+            <span id="Info">Info:None</span>
+            /
+            <span id="KeySound">KeySound:None</span>
+            /
+            <span id="LEDList">LEDList:None</span>
+            /
+            <span id="AutoData">AutoData:None</span>
+            <span id="Env" style="display:none"></span>
+            <button onclick="auto()">AutoPlay</button>
+            <button onclick="stopT()">Stop</button>
+        </div>
+        <div align="center" class="ediv">
+            <select multiple size="20" id="autoEditor" class="editor" onclick="sc(1)">
+            </select>
+            <select multiple size="20" id="keyEditor" class="editor" onclick="sc(2)">
+            </select>
+            <select multiple size="20" id="ledEditor" class="editor" onclick="sc(3)">
+            </select>
+        </div>
+        <div align="center">
+            <span id="eName"></span>
+            /
+            <span id="oIdx"></span>
+            /
+            <input type="text" id="oDesc"/>
+        </div>
+    </body>
+</html>
