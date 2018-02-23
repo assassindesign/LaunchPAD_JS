@@ -8,9 +8,8 @@
 
 # Usage
 
-	use python 3, "python LaunchpadJS_serv.py" then server on
-	in SelectBox, choose Unipack name (ex: faded, dont let me down, k-pop culture)
- 	then you can autoplay or click, button input
+	use python 3, "python LaunchpadJS_serv.py" to boot server
+	also you need web server.
   
 # Button List
 
@@ -26,6 +25,7 @@
 	
 	Version1.1 Shape of You Click▼
 [![LPSJ2](https://github.com/rouismia/LaunchPAD_JS/blob/V_1.1/img/V1.1/Shape%20of%20You.gif?raw=true)](https://www.youtube.com/watch?v=2ftGpc4Q06s&feature=youtu.be "LPSJ2")
+
 # Used API
 
 	CREATEJS(EASELJS/SOUNDJS) : https://github.com/CreateJS or https://createjs.com/
@@ -33,3 +33,6 @@
 	
 # Support Browser, Env
 	Except IE, any other browsers are supported
+	
+# Next Feature
+	Unipack Editor.
