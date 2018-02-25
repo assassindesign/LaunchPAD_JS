@@ -1,5 +1,5 @@
 // on 8x8, list of keyboard matching buttons list
-var url = 'http://rmrouis.iptime.org:9000'; //server address
+var url = 'http://127.0.0.1:9000'; //server address
 var mobile = false;                         //mobile status identifier
 var IE = false;
 var velocity;                               //color number
@@ -718,6 +718,9 @@ function fileLoader(page, key) {
 }
 
 function alz(){
+    var lstrtmp = [];
+    lstrtmp[0]=[];
+    lstrtmp[1]=[];
     lstring[0].length=0;
     lstring[1].length=0;
 
@@ -726,9 +729,9 @@ function alz(){
             for(var k = 0 ; k < keyCount[i][j]; k++)
                 if(keyTest[i][j][k]){
                     lstring[0].push((i+1)+' '+parseInt(j/8+1)+' '+(j%8+1)+' '+'1'+' '+(k+1));
-                    lstring[1].push(keyTest[i][j][k]);
+                    lstring[1].push(keyTest[i][j][k].join(''));
                 }
-    
+
     for(var i = 0 ; i < lstring[0].length; i++){
         zip.folder('keyLED').file(lstring[0][i], lstring[1][i]);
     }
