@@ -1,10 +1,5 @@
 // on 8x8, list of keyboard matching buttons list
-var keyList = [65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,
-    49,50,51,52,53,54,55,56,57,48,32,
-    96,97,98,99,100,101,102,103,104,105,
-    111,106,109,107,110,
-    189,187,8,219,221,220,186,222,188,190,191,192,16];
-var url = 'http://127.0.0.1:9000'; //server address
+var url = 'http://rmrouis.iptime.org:9000'; //server address
 var mobile = false;                         //mobile status identifier
 var IE = false;
 var velocity;                               //color number
@@ -19,10 +14,8 @@ var baseColor = "#FFFFFF";                  //base Color, dark gray
 var strokeColor = "rgba(255,255,255,0.65)";  //outer of button color, light gray
 var sound = [];                             //sample's url
 var audio = [];                             //audio obj
-var audioInstance = [];                     //arr for control audio obj
 var autoData = [];                          //auto process data
 var cirs = [];                              //page button position
-var cirs2 = [];                             //page button obj
 var rects = [];                             //button obj
 var rects2 = [];
 var velrects = [];
@@ -47,10 +40,25 @@ var autoE;
 var keyE;
 var ledE;
 
-var aFile = [];
+var vt = [];                                //velocity text
+var oSelector=0;
+var oIdx;
+var oDesc;
+var sInfo;
+var cnode = [];
+var cspan = [];
+var cspace = [];
+var creset = [];
+var sList = [];
+var lstring = [];
+var ablob = [];
+var dirs = [];
+var zip;
 var choosedcolor = 0;
 var pageKeyColor = [];
 var choosedkey;
+var keyLEDList = [];
+var upKeyList = [];
 
 //Script for Array Initialization
 if (!Array.prototype.fill) {
@@ -189,27 +197,8 @@ function cnv2Resize() {
 // initialize touch/click listener
 function initBtnEL(){
     if(!mobile) {
-        canvas.removeEventListener('dblclick', dblClicked, false);
-        canvas.addEventListener('dblclick', dblClicked, false);
         canvas.removeEventListener('click', Clicked, false);
         canvas.addEventListener('click', Clicked, false);
-        autoE.removeEventListener("dblclick", sdbc);
-        autoE.addEventListener("dblclick", sdbc);
-    }
-    else {
-        canvas.removeEventListener('touchstart', Touched);
-        canvas.addEventListener('touchstart', Touched);
-    }
-}
-
-// Mobile Touch process, allow multi touches
-function Touched(ev){
-    var touch;
-    touch = ev.touches;
-    for(ii = 0 ; ii < touch.length; ii++)
-    {
-        collides(touch[ii].pageX, touch[ii].pageY);
-        collides2(touch[ii].pageX, touch[ii].pageY);
     }
 }
 
@@ -217,12 +206,8 @@ function Touched(ev){
 function Clicked(e) {
     collides(e.offsetX, e.offsetY);
     collides2(e.offsetX, e.offsetY);
-    collides3(e.offsetX, e.offsetY, 0);
+    collides3(e.offsetX, e.offsetY);
     collides4(e.offsetX, e.offsetY);
-}
-
-function dblClicked(e) {
-    collides3(e.offsetX, e.offsetY, 1);
 }
 
 // button click/touch offset checker
@@ -241,15 +226,18 @@ function collides(x, y) {
                 myFunction(nowPage, i);
             else{
                 choosedkey = i;
+                var ckstring = "Page:"+(nowPage+1)+" Button:"+parseInt(i/8+1)+","+(i%8+1)+"-"+counter[nowPage][i];
+                if(!keyTest[nowPage][choosedkey][counter[nowPage][choosedkey]])
+                    keyTest[nowPage][choosedkey][counter[nowPage][choosedkey]] = [];
                 if(keyTest[nowPage][i][counter[nowPage][i]])
                     ledE = setOptList(ledE, keyTest[nowPage][i][counter[nowPage][i]]);
-                if(audio[nowPage][i][counter[nowPage][i]])
-                {
-                    if(keyTest[nowPage][i].length > 0)
-                        keyLED1(nowPage, i, counter[nowPage][i], 0)
+                if(keyTest[nowPage][i].length > 0)
+                    keyLED1(nowPage, i, counter[nowPage][i], 0)
+                if(sound[nowPage][i][counter[nowPage][i]]){
                     playAudio(nowPage,i);
+                    ckstring = ckstring.concat(" Duration:"+sound[nowPage][i][counter[nowPage][i]].duration);
                 }
-                else return null;
+                document.getElementById("choosedKeyStat").innerText = ckstring;
             }
         }
     }
@@ -274,9 +262,7 @@ function collides2(x, y) {
     return isCollision;
 }
 
-var keyLEDList = [];
-
-function collides3(x, y, evt) {
+function collides3(x, y) {
     var isCollision = false;
     for (var i = 0, len = rects2.length; i < len; i++) {
         var left = rects2[i].x, right = rects2[i].x+rects2[i].w;
@@ -288,12 +274,18 @@ function collides3(x, y, evt) {
             isCollision = rects2[i];
             if(!event.ctrlKey){
                 pageKeyColor[nowPage][i] = keyColor[choosedcolor];
-                keyLEDList[nowPage][choosedkey].push((nowPage+1)+" "+(parseInt(i/8)+1)+" "+((i%8)+1));
-                console.log(keyLEDList[nowPage][i]);
-                ledE = setOptList(ledE, keyLEDList[nowPage][choosedkey]);
+                var stest = "on "+parseInt(i/8+1)+" "+(i%8+1)+" a "+choosedcolor;
+                var kt = keyTest[nowPage][choosedkey][counter[nowPage][choosedkey]];
+                kt.push(stest);
+                //keyLEDList[nowPage][choosedkey].push((nowPage+1)+" "+(parseInt(i/8)+1)+" "+((i%8)+1));
+                ledE = setOptList(ledE, kt);
             }
             else {
+                var stest = "off "+parseInt(i/8+1)+" "+(i%8+1);
                 pageKeyColor[nowPage][i] = baseColor;
+                var kt = keyTest[nowPage][choosedkey][counter[nowPage][choosedkey]];
+                kt.push(stest);
+                ledE = setOptList(ledE, kt);
             }
         }
     }
@@ -311,33 +303,29 @@ function collides4(x, y) {
             && top <= y) {
             isCollision = velrects[i];
             choosedcolor = i;
-            console.log(i);
         }
     }
     return isCollision;
 }
 
-// keyDown/Up listener
-// var keysDown = {};
-// window.addEventListener('keydown', function(e) {
-//     keysDown[e.keyCode] = true;
-// });
-// window.addEventListener('keyup', function(e) {
-//     delete keysDown[e.keyCode];
-// });
-
 function myFunction(x, y) {
-    cspace[x][y].classList.toggle("show");
+    for(var i = 0 ; i < cspace.length; i++)
+        for(var j = 0 ; j < cspace[i].length; j++)
+            if(cspace[i][j].className.toLowerCase() == 'popuptext show')
+                cspace[i][j].classList.toggle("show");
+            else if(x == i && y == j)
+                cspace[x][y].classList.toggle("show");
 }
 
 function resetFile(){
+    document.getElementById("zipUp").files.length = 0;
     selinit();
     arrinit();
+    nowPage = 0;
+    choosedkey = -1;
+    choosedcolor = 0;
     LoadingStatus();
 }
-
-var vt = [];
-
 // Launchpad Canvas Renderer
 function render() {
     var siz = canvas.width > canvas.height ? canvas.height : canvas.width;
@@ -364,11 +352,14 @@ function render() {
             drect2[i] = new createjs.Shape();
             if(pressedKey[i]>0){
                 drect[i].graphics.setStrokeStyle(cornerRad/2, "round", "round", cornerRad).beginStroke(coloredKey[i]).beginFill(baseColor).drawRect(rects[i].x+cornerRad/3, rects[i].y+cornerRad/3, rects[i].w-cornerRad*2/3, rects[i].h-cornerRad*2/3);
-                if(!mobile && !IE)
+                if(!IE)
                     drect[i].shadow = new createjs.Shadow(coloredKey[i], 0, 0, cornerRad*2);
             } else
                 drect[i].graphics.setStrokeStyle(cornerRad*4/5, "round", "round", cornerRad).beginStroke(strokeColor).beginFill(baseColor).drawRect(rects[i].x+cornerRad/2, rects[i].y+cornerRad/2, rects[i].w-cornerRad, rects[i].h-cornerRad);
-            drect2[i].graphics.setStrokeStyle(cornerRad*4/5, "round", "round", cornerRad).beginStroke(strokeColor).beginFill(pageKeyColor[nowPage][i]).drawRect(rects2[i].x+cornerRad/2, rects2[i].y+cornerRad/2, rects2[i].w-cornerRad, rects2[i].h-cornerRad);
+            if(i == choosedkey)
+                drect2[i].graphics.setStrokeStyle(cornerRad/2, "round", "round", cornerRad).beginStroke(pageKeyColor[nowPage][i]).beginFill(keyColor[120]).drawRect(rects2[i].x+cornerRad/2, rects2[i].y+cornerRad/2, rects2[i].w-cornerRad, rects2[i].h-cornerRad);
+            else
+                drect2[i].graphics.setStrokeStyle(cornerRad/2, "round", "round", cornerRad).beginStroke(pageKeyColor[nowPage][i]).beginFill(baseColor).drawRect(rects2[i].x+cornerRad/2, rects2[i].y+cornerRad/2, rects2[i].w-cornerRad, rects2[i].h-cornerRad);
             stage.addChild(drect[i]);
             stage.addChild(drect2[i]);
         }
@@ -388,7 +379,6 @@ function render() {
 
         for(var i = 0 ; i < chain; i++){
             cirs[i] = {x: rects[(i+1)*keyX-1].x+rects[0].w+cornerRad/2, y: rects[(i+1)*keyX-1].y, w: rects[(i+1)*keyX-1].w, h: rects[(i+1)*keyX-1].h};
-            //cirs2[i] = {x: cirs[i].x+rects[0].w/2, y:cirs[i].y+rects[0].h/2, w:(cirs[i].w-cornerRad/2)/2, h:(cirs[i].w-cornerRad/2)/2};
             stage.removeChild(dcir[i]);
             dcir[i] = new createjs.Shape();
             dcir[i].graphics.setStrokeStyle(cornerRad/2);
@@ -456,8 +446,7 @@ function animatecanv(key){
 
 // Audio Play Process
 function playAudio(page, key) {
-    if(audio[page][key][counter[page][key]])
-    {
+    if(sound[page][key][counter[page][key]]){
         sound[page][key][counter[page][key]].currentTime = 0;
         sound[page][key][counter[page][key]].play();
         //createjs.Sound.play(audio[page][key][counter[page][key]],{interrupt: createjs.Sound.INTERRUPT_ANY});
@@ -473,30 +462,30 @@ function LoadingStatus(){
     document.getElementById("AutoData").innerText="AutoData:Loading";
 }
 
-// set project
-function setProject() {
-    stopT();    // if autoplay process turned on, then off
-    projectName = "Projects/"+songs[select.selectedIndex];
-    nowPage = 0;
-    LoadingStatus();    // set all message to loading
+// // set project
+// function setProject() {
+//     stopT();    // if autoplay process turned on, then off
+//     projectName = "Projects/"+songs[select.selectedIndex];
+//     nowPage = 0;
+//     LoadingStatus();    // set all message to loading
 
-    //get all data
-    getData(projectName+'/info', function(result){
-        setInfo(result.msg);
-        initBtnEL();
-        getData(projectName+'/keySound', function(result){
-            setKey(result.msg);
-        });
-        getData(projectName+"/LEDList", function(result){
-            setLED(result.msg);
-        });
-        getData(projectName+'/autoPlay', function(result){
-            autoData.length=0;
-            autoData = result.msg;
-            document.getElementById("AutoData").innerText="AutoData:Loaded";
-        });
-    });
-}
+//     //get all data
+//     getData(projectName+'/info', function(result){
+//         setInfo(result.msg);
+//         initBtnEL();
+//         getData(projectName+'/keySound', function(result){
+//             setKey(result.msg);
+//         });
+//         getData(projectName+"/LEDList", function(result){
+//             setLED(result.msg);
+//         });
+//         getData(projectName+'/autoPlay', function(result){
+//             autoData.length=0;
+//             autoData = result.msg;
+//             document.getElementById("AutoData").innerText="AutoData:Loaded";
+//         });
+//     });
+// }
 
 function setOptList(cList, content){
     cList.options.length=0;
@@ -511,49 +500,129 @@ function setOptList(cList, content){
 function sc(ocase){
     switch(ocase){
         case 1:
+        oSelector = 1;
         optSet(autoE, "AutoData");
         break;
         case 2:
+        oSelector = 2;
         optSet(keyE, "KeyData");
         break;
         case 3:
+        oSelector = 3;
         optSet(ledE, "LEDData");
         break;
     }
 }
 
+function scSet(){
+    oIdx = document.getElementById("oIdx").value;
+    switch(oSelector){
+        case 1:
+        autoData[oIdx] = document.getElementById("oDesc").value;
+        autoE = setOptList(autoE, autoData);
+        break;
+        case 2:
+        sList[oIdx] = document.getElementById("oDesc").value;
+        keyE = setOptList(keyE, sList);
+        break;
+        case 3:
+        keyTest[nowPage][choosedkey][counter[nowPage][choosedkey]][oIdx] = document.getElementById("oDesc").value;
+        ledE = setOptList(ledE, keyTest[nowPage][choosedkey][counter[nowPage][choosedkey]]);
+        break;
+    }
+}
+
+function scInsertA(){
+    oIdx = document.getElementById("oIdx").value;
+    switch(oSelector){
+        case 1:
+        autoData.splice(oIdx,0,document.getElementById("oDesc").value);
+        autoE = setOptList(autoE, autoData);
+        break;
+        case 2:
+        sList.splice(oIdx,0,document.getElementById("oDesc").value);
+        keyE = setOptList(keyE, sList);
+        break;
+        case 3:
+        keyTest[nowPage][choosedkey][counter[nowPage][choosedkey]].splice(oIdx,0,document.getElementById("oDesc").value);
+        ledE = setOptList(ledE, keyTest[nowPage][choosedkey][counter[nowPage][choosedkey]]);
+        break;
+    }
+}
+
+function scInsertB(){
+    oIdx = document.getElementById("oIdx").value;
+    switch(oSelector){
+        case 1:
+        autoData.splice(oIdx+1,0,document.getElementById("oDesc").value);
+        autoE = setOptList(autoE, autoData);
+        break;
+        case 2:
+        sList.splice(oIdx+1,0,document.getElementById("oDesc").value);
+        keyE = setOptList(keyE, sList);
+        break;
+        case 3:
+        keyTest[nowPage][choosedkey][counter[nowPage][choosedkey]].splice(oIdx+1,0,document.getElementById("oDesc").value);
+        ledE = setOptList(ledE, keyTest[nowPage][choosedkey][counter[nowPage][choosedkey]]);
+        break;
+    }
+}
+
+function scDelete(){
+    switch(oSelector){
+        case 1:
+        autuData = listDel(autoE, autoData);
+        autoE = setOptList(autoE, autoData);
+        break;
+        case 2:
+        sList = listDel(keyE, sList);
+        keyE = setOptList(keyE, sList);
+        break;
+        case 3:
+        keyTest[nowPage][choosedkey][counter[nowPage][choosedkey]] = listDel(ledE,keyTest[nowPage][choosedkey][counter[nowPage][choosedkey]]);
+        ledE = setOptList(ledE, keyTest[nowPage][choosedkey][counter[nowPage][choosedkey]]);
+        break;
+    }
+}
+
+function scDur() {
+    switch(oSelector){
+        case 1:
+        autoData.push("d "+document.getElementById("sDur").value)
+        autoE = setOptList(autoE, autoData);
+        break;
+        case 3:
+        keyTest[nowPage][choosedkey][counter[nowPage][choosedkey]].push("d "+document.getElementById("sDur").value)
+        ledE = setOptList(ledE, keyTest[nowPage][choosedkey][counter[nowPage][choosedkey]]);
+        break;
+    }
+}
+
+function listDel(dlist, content) {
+    var dmin=0, dmax=0;
+    var i = dlist.options.length;
+    while(i > 0){
+        i--;
+        if(dlist.options[i].selected)
+            content.splice(i,1);
+    }
+    
+    return content;
+}
+
 function optSet(content, ename){
+    document.getElementById("eName").innerText=ename;
     for(var i=0; i<content.options.length; i++){
         if(content.options[i].selected){
-            document.getElementById("eName").innerText=ename;
-            document.getElementById("oIdx").innerText=i;
+            document.getElementById("oIdx").value=i;
             document.getElementById("oDesc").value=content.options[i].innerText;
         }
     }
 }
 
-function ksc(){
-    for(var i=0; i<keyE.options.length; i++){
-        if(keyE.options[i].selected){
-            document.getElementById("keyCNT").innerText=i;
-        }
-    }
-}
-
-function sdbc() {
-    for(var i=0; i<autoE.options.length; i++){
-        if(autoE.options[i].selected){
-            alert(autoData[i]+" removed!");
-            //autoData.splice(i, 1);
-            autoE.options[i].selected = false;
-            autoE = setOptList(autoE, autoData);
-        }
-    }
-}
-
-var cnode = [];
-
 function setInfo(content){
+    sInfo = content;
+    console.log(sInfo);
     for(var i = 0 ; i < content.length ; i++)
     {
         var str = content[i].split('=');
@@ -575,22 +644,24 @@ function setInfo(content){
     document.getElementById("Info").innerText="Info:Loaded";
 }
 
-var cspan = [];
-var cspace = [];
-
 function setUpForm() {
-    var popup = document.getElementById('poptest');
-    while(popup.firstChild)
+    var popup = document.getElementById('popSpace');
+    
+    while(popup.firstChild && popup.hasChildNodes)
         popup.removeChild(popup.firstChild);
+
     cnode.length = 0;
     cspan.length = 0;
     cspace.length = 0;
+    creset.length = 0;
     for(var i = 0 ; i < chain; i++){
         cnode[i] = [];
         cspan[i] = [];
         cspace[i] = [];
+        creset[i] = [];
         for(var j = 0 ; j < keyX*keyY; j++){
-            cspace[i][j] = document.createElement("div");
+            var reader = new FileReader();
+            cspace[i][j] = document.createElement("form");
             cspace[i][j].setAttribute('class', 'popuptext');
             cspan[i][j] = document.createElement("span");
             cspan[i][j].innerText = "Page:"+(i+1)+"/Button:"+(j+1);
@@ -599,11 +670,91 @@ function setUpForm() {
             cnode[i][j].setAttribute('id', 'myPopup_'+i+"_"+j);
             cnode[i][j].setAttribute('accept', 'audio/*');
             cnode[i][j].setAttribute('multiple', "");
+            cnode[i][j].setAttribute('onchange', 'fileLoader('+i+','+j+')');
+            creset[i][j] = document.createElement("input");
+            creset[i][j].setAttribute('type','reset');
+            creset[i][j].setAttribute('onclick', 'formReset('+i+','+j+')');
             cspace[i][j].appendChild(cspan[i][j]);
             cspace[i][j].appendChild(cnode[i][j]);
+            cspace[i][j].appendChild(creset[i][j]);
             popup.appendChild(cspace[i][j]);
         }
     }
+}
+
+function formReset(page, key){
+    setTimeout(function(){
+        fileLoader(page,key);
+    }, 50);
+}
+
+function fileLoader(page, key) {
+    var files = cnode[page][key].files;
+    upKeyList[page][key].length = 0;    
+    var reader = new FileReader();
+    function readMassFiles(index){
+        if(index >= files.length) {
+            keyE.options.length = 0;
+            sList.length = 0;
+            for(var i = 0 ; i < chain ; i++)
+                for(var j = 0 ; j < keyX*keyY; j++)
+                    if(upKeyList[i][j].length > 0)
+                        sList = sList.concat(upKeyList[i][j]);
+            keyE = setOptList(keyE, sList);
+            return;
+        }
+        var file = files[index];
+        var soundString = (page+1)+" "+(parseInt(key/8)+1)+" "+((key%8)+1)+" "+file.name;
+        upKeyList[page][key].push(soundString);
+        reader.onload = function(e) {
+            sound[page][key][keyCount[page][key]] = new Audio();
+            sound[page][key][keyCount[page][key]].src = e.target.result;
+            keyCount[page][key]++;
+            readMassFiles(index+1);
+        }
+        reader.readAsDataURL(file);
+    }
+    readMassFiles(0);
+}
+
+function alz(){
+    lstring[0].length=0;
+    lstring[1].length=0;
+
+    for(var i = 0 ; i < chain; i++)
+        for(var j = 0 ; j < keyX*keyY; j++)
+            for(var k = 0 ; k < keyCount[i][j]; k++)
+                if(keyTest[i][j][k]){
+                    lstring[0].push((i+1)+' '+parseInt(j/8+1)+' '+(j%8+1)+' '+'1'+' '+(k+1));
+                    lstring[1].push(keyTest[i][j][k]);
+                }
+    
+    for(var i = 0 ; i < lstring[0].length; i++){
+        zip.folder('keyLED').file(lstring[0][i], lstring[1][i]);
+    }
+}
+
+function pj2zip() {
+    alz();
+
+    var aptxt="";
+    var kstxt="";
+    var iftxt="";
+
+    for(var i = 0 ; i < sInfo.length; i++)
+        iftxt = iftxt.concat(sInfo[i]+'\n');
+    for(var i = 0 ; i < autoData.length; i++)
+        aptxt = aptxt.concat(autoData[i]+'\n');
+    for(var i = 0 ; i < sList.length; i++)
+        kstxt = kstxt.concat(sList[i]+'\n');
+
+    zip.file('info', iftxt);
+    zip.file('autoPlay', aptxt);
+    zip.file('keySound', kstxt);
+
+    zip.generateAsync({type:"base64"}).then(function (base64) {
+        location.href="data:application/zip;base64," + base64;
+    });
 }
 
 function setKey(content){
@@ -642,11 +793,6 @@ function setLED(content){
     document.getElementById("LEDList").innerText="LEDList:Loaded";
 }
 
-var sList = [];
-var lstring = [];
-var ablob = [];
-var dirs = [];
-
 function handleFile(f){
     var title = f.name;
     var dateBefore = new Date();
@@ -672,6 +818,11 @@ function handleFile(f){
                 .then(function(content){
                     sList = content.split('\n');
                     keyE = setOptList(keyE, sList);
+                    for (var i = 0 ; i < sList.length; i++)
+                        if((str = sList[i].split(' ')).length >= 4){
+                            var kstr = sList[i];
+                            upKeyList[parseInt(str[0])-1][(parseInt(str[1])-1)*8+(parseInt(str[2])-1)] = kstr;
+                        }
                 });
             }
             if(zipEntry.dir == true){
@@ -741,6 +892,7 @@ function setLEDZip(content){
 
 // set project
 function setProjectFile() {
+    zip = new JSZip();
     stopT();    // if autoplay process turned on, then off
     nowPage = 0;
     LoadingStatus();    // set all message to loading
@@ -761,14 +913,24 @@ function setProjectFile() {
 }
 
 function setNewPJ() {
+    zip = new JSZip();
     var pjName = document.getElementById("pjName").value;
     var pjChain = document.getElementById("pjChain").value;
     var pjX = document.getElementById("pjX").value;
     var pjY = document.getElementById("pjY").value;
 
+    autoData.length=0;
+    sList.length=0;
+    sInfo=[];
+
     chain = parseInt(pjChain);
     keyX = parseInt(pjX);
     keyY = parseInt(pjY);
+
+    sInfo.push("title="+pjName);
+    sInfo.push("chain="+pjChain);
+    sInfo.push("ButtonX="+pjY);
+    sInfo.push("ButtonY="+pjX);
 
     selinit();
     arrinit();
@@ -829,8 +991,10 @@ function autoProcess(tt) {
         else if(tCase == 'o' || tCase == 'on')
         {
             var keyNum = (parseInt(temp[1])-1)*keyY+(parseInt(temp[2])-1);
-            if(keyTest[nowPage][keyNum].length > 0)
+            if(keyTest[nowPage][keyNum].length > 0){
+                choosedkey = keyNum;
                 keyLED1(nowPage, keyNum, counter[nowPage][keyNum], 0);
+            }
             playAudio(nowPage, keyNum);
         }
 
@@ -927,6 +1091,7 @@ function keyLED1(page, key, cnt, tt) {
 //stop auto process
 function stopT() {
     //all timer out
+    choosedkey = null;
     clearTimeout(st);
     autoP = false;
     initz();
@@ -965,7 +1130,6 @@ function arrinit() {
     ablob[1] = [];
     lstring[0] = [];
     lstring[1] = [];
-    aFile.length = 0;
     // songs list init
     sound.length = 0;
     audio.length = 0;
@@ -974,7 +1138,6 @@ function arrinit() {
     keyCount.length = 0;
     counter.length = 0;
     keyTest.length=0;
-    audioInstance.length=0;
     anim.length=0;
     drect.length=0;
     drect2.length=0;
@@ -986,7 +1149,7 @@ function arrinit() {
     cirs.length = 0;
     pageKeyColor.length = 0;
     keyLEDList.length = 0;
-    //cirs2.length = 0;
+    upKeyList.length = 0;
     for(var j = 0 ; j < chain; j++)
     {
         sound[j] = [];
@@ -996,6 +1159,7 @@ function arrinit() {
         keyTest[j] = [];
         pageKeyColor[j] = [];
         keyLEDList[j] = [];
+        upKeyList[j] = [];
         for(var i = 0 ; i < keyX*keyY; i++)
         {
             sound[j][i] = [];
@@ -1007,6 +1171,7 @@ function arrinit() {
             keyTest[j][i] = [];
             pageKeyColor[j][i] = baseColor;
             keyLEDList[j][i] = [];
+            upKeyList[j][i] = [];
         }
     }
 }

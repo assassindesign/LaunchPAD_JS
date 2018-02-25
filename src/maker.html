@@ -51,6 +51,10 @@
                 animation: fadeIn 1s;
             }
 
+            .popup .showoff{
+                visibility: hidden;
+            }
+
             /* Add animation (fade in the popup) */
             @-webkit-keyframes fadeIn {
                 from {opacity: 0;} 
@@ -70,21 +74,21 @@
         <script type="text/javascript" src="lib/createjs.min.js"></script>
         <script type="text/javascript" src="lib/jszip.min.js"></script>
         <canvas id='canv'></canvas>
-        <form class="popup" id="poptest"></form>
+        <div class="popup" id="popSpace"></div>
         <div align="center">
-            <form>
+            <button onclick="setFile()">File SET</button>
+            <form style="display: inline;">
                 <input id="zipUp" type="file" accept="application/zip" onchange="setProjectFile()"/>
                 <input type="reset" value="RESET" onclick="resetFile()"/>
             </form>
+            <BR/>
             <input type="text" id="pjName" placeholder="Song Name"/>
             <input type="text" id="pjChain" style="width:2%" placeholder="Page"/>
             <input type="text" id="pjX" style="width:2%" placeholder="X"/>
             <input type="text" id="pjY" style="width:2%" placeholder="Y"/>
             <button onclick="setNewPJ()">NEW Project</button>
             <BR/>
-            <button onclick="setFile()">File SET</button>
             <select style="display:none" id="Selector" name="Songs"></select>
-            <button style="display:none" onclick="setProject()">SET</button>
             <span id="Velocity" style="display:none">Velocity:None</span>
             <span id="Info">Info:None</span>
             /
@@ -96,21 +100,32 @@
             <span id="Env" style="display:none"></span>
             <button onclick="auto()">AutoPlay</button>
             <button onclick="stopT()">Stop</button>
+            <button onclick="pj2zip()">Save</button>
+            <BR/>
+            <span id="choosedKeyStat">*Choosed Key Status*</span>
         </div>
         <div align="center" class="ediv">
-            <select multiple size="20" id="autoEditor" class="editor" onclick="sc(1)">
+            <select multiple size="18" id="autoEditor" class="editor" onclick="sc(1)">
             </select>
-            <select multiple size="20" id="keyEditor" class="editor" onclick="sc(2)">
+            <select multiple size="18" id="keyEditor" class="editor" onclick="sc(2)">
             </select>
-            <select multiple size="20" id="ledEditor" class="editor" onclick="sc(3)">
+            <select multiple size="18" id="ledEditor" class="editor" onclick="sc(3)">
             </select>
         </div>
         <div align="center">
-            <span id="eName"></span>
+            <span id="eName">Selector</span>
             /
-            <span id="oIdx"></span>
+            <input type="text" style="width:40px" id="oIdx" placeholder="Index"></input>
             /
-            <input type="text" id="oDesc"/>
+            <input type="text" id="oDesc" placeholder="Data String"/>
+            <button onclick="scSet()">SET</button>
+            <button onclick="scInsertA()">INSERT ABOVE</button>
+            <button onclick="scInsertB()">INSERT BELOW</button>
+            <button onclick="scDelete()">DELETE</button>
+            /
+            <input type="text" style="width:60px" id="sDur" placeholder="Duration"/>
+            <button onclick="scDur()">Insert Duration</button>
+            <span>(Only for AutoData&keyLEDData)</span>
         </div>
     </body>
 </html>
