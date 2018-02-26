@@ -4,11 +4,13 @@
 # Installation
 
 	must install python 3 and flask, flask_restful, functool for server and logging for debugging
-	pip install flask, pip install flask_restful...
+	pip install flask
+	pip install flask_restful
+	pip install logging (If not exists)
 
 # Usage
 
-	use python 3, "python LaunchpadJS_serv.py" to boot server
+	use python 3.6 or 3.7b, "python LaunchpadJS_serv.py" to boot server
 	also you need web server.
   
 # Button List
