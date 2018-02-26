@@ -222,9 +222,12 @@ function collides(x, y) {
             && top <= y) {
             isCollision = rects[i];
             
-            if(event.ctrlKey)
+            if(event.ctrlKey){
                 myFunction(nowPage, i);
+                choosedkey = -1;
+            }
             else{
+                initz();
                 choosedkey = i;
                 var ckstring = "Page:"+(nowPage+1)+" Button:"+parseInt(i/8+1)+","+(i%8+1)+"-"+counter[nowPage][i];
                 if(!keyTest[nowPage][choosedkey][counter[nowPage][choosedkey]])
@@ -660,7 +663,6 @@ function setUpForm() {
         cspace[i] = [];
         creset[i] = [];
         for(var j = 0 ; j < keyX*keyY; j++){
-            var reader = new FileReader();
             cspace[i][j] = document.createElement("form");
             cspace[i][j].setAttribute('class', 'popuptext');
             cspan[i][j] = document.createElement("span");
@@ -689,6 +691,10 @@ function formReset(page, key){
 }
 
 function fileLoader(page, key) {
+    cnode[page][key].files.length = 0;
+    sound[page][key].length = 0;
+    keyCount[page][key] = 0;
+    counter[page][key] = 0;
     var files = cnode[page][key].files;
     upKeyList[page][key].length = 0;    
     var reader = new FileReader();
@@ -707,6 +713,7 @@ function fileLoader(page, key) {
         var soundString = (page+1)+" "+(parseInt(key/8)+1)+" "+((key%8)+1)+" "+file.name;
         upKeyList[page][key].push(soundString);
         reader.onload = function(e) {
+            audio[page][key][keyCount[page][key]] = file.name;
             sound[page][key][keyCount[page][key]] = new Audio();
             sound[page][key][keyCount[page][key]].src = e.target.result;
             keyCount[page][key]++;
@@ -1172,7 +1179,7 @@ function arrinit() {
             keyCount[j][i] = 0;
             counter[j][i] = 0;
             keyTest[j][i] = [];
-            pageKeyColor[j][i] = baseColor;
+            pageKeyColor[j][i] = strokeColor;
             keyLEDList[j][i] = [];
             upKeyList[j][i] = [];
         }

@@ -70,7 +70,7 @@
     <body>
         <script type="text/javascript" src="lib/jquery-3.3.1.min.js"></script>
         <script type="text/javascript" src="lib/jquery-ui.min.js"></script>
-        <script type="text/javascript" src="lib/maker.js"></script>
+        <script type="text/javascript" src="lib/maker.min.js"></script>
         <script type="text/javascript" src="lib/createjs.min.js"></script>
         <script type="text/javascript" src="lib/jszip.min.js"></script>
         <canvas id='canv'></canvas>
@@ -83,9 +83,9 @@
             </form>
             <BR/>
             <input type="text" id="pjName" placeholder="Song Name"/>
-            <input type="text" id="pjChain" style="width:2%" placeholder="Page"/>
-            <input type="text" id="pjX" style="width:2%" placeholder="X"/>
-            <input type="text" id="pjY" style="width:2%" placeholder="Y"/>
+            <input type="number" min=1 id="pjChain" style="width:3%" placeholder="Page"/>
+            <input type="number" min=1 id="pjX" style="width:2%" placeholder="X"/>
+            <input type="number" min=1 id="pjY" style="width:2%" placeholder="Y"/>
             <button onclick="setNewPJ()">NEW Project</button>
             <BR/>
             <select style="display:none" id="Selector" name="Songs"></select>
@@ -115,7 +115,7 @@
         <div align="center">
             <span id="eName">Selector</span>
             /
-            <input type="text" style="width:40px" id="oIdx" placeholder="Index"></input>
+            <input type="number" style="width:3%" id="oIdx" placeholder="Index"></input>
             /
             <input type="text" id="oDesc" placeholder="Data String"/>
             <button onclick="scSet()">SET</button>
@@ -123,7 +123,7 @@
             <button onclick="scInsertB()">INSERT BELOW</button>
             <button onclick="scDelete()">DELETE</button>
             /
-            <input type="text" style="width:60px" id="sDur" placeholder="Duration"/>
+            <input type="number" style="width:4%" id="sDur" placeholder="Duration"/>
             <button onclick="scDur()">Insert Duration</button>
             <span>(Only for AutoData&keyLEDData)</span>
         </div>

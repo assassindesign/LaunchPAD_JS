@@ -24,7 +24,6 @@ var autoData = [];                          //auto process data
 var cirs = [];                              //page button position
 var cirs2 = [];                             //page button obj
 var rects = [];                             //button obj
-var anim = [];                              //button LED animation arr
 var drect = [];
 var dcir = [];
 var bg;
@@ -107,8 +106,8 @@ window.onload = function() {
             document.getElementById("Env").innerText = "PC";
             if(!isIE && !isEdge){
                 IE = false;
-                createjs.Ticker.on("tick", render);
-                createjs.Ticker.framerate = 144;
+                createjs.Ticker.on("tick", animate);
+                createjs.Ticker.framerate = 60;
             }
             else{
                 IE = true;
@@ -253,6 +252,7 @@ function render() {
             stage.addChild(drect[i]);
         }
 
+        // set chain buttons offset, draw chain button
         for(var i = 0 ; i < chain; i++){
             cirs[i] = {x: rects[(i+1)*keyX-1].x+rects[0].w+cornerRad/2, y: rects[(i+1)*keyX-1].y, w: rects[(i+1)*keyX-1].w, h: rects[(i+1)*keyX-1].h};
             cirs2[i] = {x: cirs[i].x+rects[0].w/2, y:cirs[i].y+rects[0].h/2, w:(cirs[i].w-cornerRad/2)/2, h:(cirs[i].w-cornerRad/2)/2};
@@ -279,18 +279,15 @@ function animate(){
 
     //pressed buttons outter get glow
     for(var i = 0 ; i < rects.length; i++){
-        stage.removeChild(anim[i]);
-        if(pressedKey[i]>0) {
-            anim[i] = new createjs.Shape();
-            // Inner Glow Version
-            // anim[i].graphics.setStrokeStyle(cornerRad/2, "round", "round", cornerRad).beginStroke(coloredKey[nowPage][i]).beginFill("transparent").drawRect(rects[i].x+cornerRad, rects[i].y+cornerRad, rects[i].w-cornerRad*2, rects[i].h-cornerRad*2);
-            // anim[i].shadow = new createjs.Shadow(coloredKey[nowPage][i], 0, 0, cornerRad*2);
-            // Outer Glow Version
-            anim[i].graphics.setStrokeStyle(cornerRad/2, "round", "round", cornerRad).beginStroke(coloredKey[i]).beginFill("transparent").drawRect(rects[i].x+cornerRad/3, rects[i].y+cornerRad/3, rects[i].w-cornerRad*2/3, rects[i].h-cornerRad*2/3);
-            anim[i].shadow = new createjs.Shadow(coloredKey[i], 0, 0, cornerRad*2);
-            stage.addChild(anim[i]);
-        }
-        else continue;
+        stage.removeChild(drect[i]);
+        drect[i] = new createjs.Shape();
+        if(pressedKey[i]>0){
+            drect[i].graphics.setStrokeStyle(cornerRad/2, "round", "round", cornerRad).beginStroke(coloredKey[i]).beginFill(baseColor).drawRect(rects[i].x+cornerRad/3, rects[i].y+cornerRad/3, rects[i].w-cornerRad*2/3, rects[i].h-cornerRad*2/3);
+            if(!mobile && !IE)
+                drect[i].shadow = new createjs.Shadow(coloredKey[i], 0, 0, cornerRad*2);
+        } else
+            drect[i].graphics.setStrokeStyle(cornerRad*4/5, "round", "round", cornerRad).beginStroke(strokeColor).beginFill(baseColor).drawRect(rects[i].x+cornerRad/2, rects[i].y+cornerRad/2, rects[i].w-cornerRad, rects[i].h-cornerRad);
+        stage.addChild(drect[i]);
     }
     stage.update();
 }
@@ -356,9 +353,13 @@ window.addEventListener("keydown", function(e) {
 function playAudio(page, key) {
     if(audio[page][key][counter[page][key]])
     {
-        sound[page][key][counter[page][key]].currentTime = 0;
-        sound[page][key][counter[page][key]].play();
-        //createjs.Sound.play(audio[page][key][counter[page][key]],{interrupt: createjs.Sound.INTERRUPT_ANY});
+        if(!mobile){
+            sound[page][key][counter[page][key]].currentTime = 0;
+            sound[page][key][counter[page][key]].play();
+        }
+        else {
+            createjs.Sound.play(audio[page][key][counter[page][key]],{interrupt: createjs.Sound.INTERRUPT_ANY});
+        }
         counter[page][key] = (counter[page][key]+1)%keyCount[page][key];
     }
 }
@@ -427,9 +428,11 @@ function setKey(content){
         {
             var page = parseInt(str[0])-1;
             var num = ((parseInt(str[1])-1)*keyY)+(parseInt(str[2])-1);
+            var scnt = keyCount[page][num];
             sound[page][num].push(new Audio('Server/'+projectName+'/sounds/'+str[3]));
-            audio[page][num][keyCount[page][num]] = str[3];
-            //createjs.Sound.registerSound(sound[page][num][keyCount[page][num]], audio[page][num][keyCount[page][num]], 1);
+            audio[page][num][scnt] = str[3];
+            if(mobile)
+                createjs.Sound.registerSound(sound[page][num][scnt].src, audio[page][num][scnt], 1);
             keyCount[page][num]++;
         }
         else continue;
@@ -521,10 +524,12 @@ function setKeyZip(content){
             var num = ((parseInt(str[1])-1)*keyY)+(parseInt(str[2])-1);
             var stmp = ablob[0].indexOf(str[3].replace(/\r/gi,""));
             if( stmp >-1 ){
-                audio[page][num][keyCount[page][num]] = ablob[0][stmp];
+                var scnt = keyCount[page][num];
+                audio[page][num][scnt] = ablob[0][stmp];
                 sound[page][num].push(new Audio(ablob[1][stmp]));
+                //console.log(sound[page][num][scnt].src);
                 //createjs.Sound.alternateExtensions = ["mp3", "ogg", "wav"];
-                //createjs.Sound.registerSound(sound[page][num][keyCount[page][num]], audio[page][num][keyCount[page][num]], 1);
+                //createjs.Sound.registerSound(sound[page][num][scnt].src,audio[page][num][scnt], 1);
                 keyCount[page][num]++;
             }
         }
@@ -781,7 +786,6 @@ function arrinit() {
     counter.length = 0;
     keyTest.length=0;
     audioInstance.length=0;
-    anim.length=0;
     drect.length=0;
     dcir.length=0;
     rects.length = 0;
