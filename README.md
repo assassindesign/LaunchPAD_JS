@@ -1,3 +1,6 @@
+# This Project is being coded again
+	It's will take a while
+
 # LaunchPAD_JS
 	LaunchPAD on JavaScript like novation LaunchPAD + Unipack Editor
 
@@ -41,6 +44,3 @@
 	
 # Support Browser, Env
 	Except IE, any other browsers are supported
-	
-# Next Feature
-	Unipack Editor.
