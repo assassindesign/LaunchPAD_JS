@@ -37,8 +37,8 @@ usage soon will be update....
 ![VUED](https://github.com/rouismia/LaunchPAD_JS/blob/V_1.2/img/V1.1/editor.PNG?raw=true)
 
 # Used API
-CREATEJS(EASELJS/SOUNDJS) : https://github.com/CreateJS or https://createjs.com/
-JSZIP : https://stuk.github.io/jszip/
+	CREATEJS(EASELJS/SOUNDJS) : https://github.com/CreateJS or https://createjs.com/
+	JSZIP : https://stuk.github.io/jszip/
 	
 # Support Browser, Env
 	Except IE, any other browsers are supported
