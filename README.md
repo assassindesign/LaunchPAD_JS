@@ -1,6 +1,10 @@
 # This Project is being coded again
 	It's will take a while
 
+# Now Chrome Extension Available!
+	Search LaunchPAD:JS on Store or Link to
+	https://chrome.google.com/webstore/detail/launchpad-for-chrome/ihdlemjmbepnbcegdepdeiggpcgdknjm?hl=ko
+
 # LaunchPAD_JS
 	LaunchPAD on JavaScript like novation LaunchPAD + Unipack Editor
 
